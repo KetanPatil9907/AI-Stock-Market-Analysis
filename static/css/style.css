@@ -1,0 +1,230 @@
+:root {
+    --finance-navy: #0b1f3a;
+    --finance-blue: #155eef;
+    --finance-light: #f5f8ff;
+    --finance-green: #0e9f6e;
+    --finance-text: #1f2937;
+    --finance-muted: #6b7280;
+}
+
+body {
+    background-color: var(--finance-light);
+    color: var(--finance-text);
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.site-main {
+    min-height: calc(100vh - 160px);
+}
+
+.finance-navbar {
+    background: linear-gradient(135deg, var(--finance-navy), #123d76);
+    box-shadow: 0 2px 14px rgba(11, 31, 58, 0.15);
+}
+
+.navbar-brand {
+    letter-spacing: -0.3px;
+}
+
+.nav-link-disabled {
+    color: rgba(255, 255, 255, 0.45) !important;
+    cursor: not-allowed;
+}
+
+.auth-section {
+    padding: 3.5rem 0;
+}
+
+.auth-card {
+    border-radius: 1rem;
+    overflow: hidden;
+}
+
+.auth-icon {
+    align-items: center;
+    background: linear-gradient(135deg, var(--finance-blue), #6d5dfc);
+    border-radius: 50%;
+    color: #ffffff;
+    display: inline-flex;
+    font-size: 1.5rem;
+    height: 58px;
+    justify-content: center;
+    width: 58px;
+}
+
+.btn-finance {
+    background: var(--finance-blue);
+    border-color: var(--finance-blue);
+    color: #ffffff;
+}
+
+.btn-finance:hover,
+.btn-finance:focus {
+    background: #0e4dcc;
+    border-color: #0e4dcc;
+    color: #ffffff;
+}
+
+.form-control:focus {
+    border-color: var(--finance-blue);
+    box-shadow: 0 0 0 0.2rem rgba(21, 94, 239, 0.16);
+}
+
+.dashboard-section {
+    min-height: 72vh;
+}
+
+.dashboard-welcome {
+    align-items: end;
+    display: flex;
+    justify-content: space-between;
+}
+
+.educational-badge {
+    background-color: #e8efff;
+    color: #155eef;
+    font-weight: 600;
+}
+
+.statistic-card {
+    border-radius: 1rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.statistic-card:hover {
+    box-shadow: 0 1rem 2rem rgba(11, 31, 58, 0.12) !important;
+    transform: translateY(-4px);
+}
+
+.statistic-icon {
+    align-items: center;
+    border-radius: 0.85rem;
+    display: inline-flex;
+    font-size: 1.4rem;
+    height: 48px;
+    justify-content: center;
+    width: 48px;
+}
+
+.statistic-label {
+    color: var(--finance-muted);
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-top: 1rem;
+}
+
+.statistic-value {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.dashboard-panel {
+    border-radius: 1rem;
+}
+
+.tool-header-icon {
+    color: var(--finance-blue);
+    font-size: 1.5rem;
+}
+
+.tool-card {
+    background-color: #f8faff;
+    border: 1px solid #e6edff;
+    border-radius: 0.85rem;
+    padding: 1.25rem;
+    transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.tool-card:hover {
+    border-color: #adc8ff;
+    transform: translateY(-3px);
+}
+
+.tool-icon {
+    font-size: 1.8rem;
+    margin-bottom: 0.8rem;
+}
+
+.activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.activity-item {
+    align-items: flex-start;
+    border-bottom: 1px solid #eef1f5;
+    display: flex;
+    gap: 0.75rem;
+    padding-bottom: 1rem;
+}
+
+.activity-item:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+}
+
+.activity-item-icon {
+    align-items: center;
+    background: #e8efff;
+    border-radius: 50%;
+    color: var(--finance-blue);
+    display: flex;
+    flex-shrink: 0;
+    font-size: 1rem;
+    height: 36px;
+    justify-content: center;
+    width: 36px;
+}
+
+.activity-time {
+    font-size: 0.74rem;
+}
+
+.empty-state-icon {
+    color: #94a3b8;
+    font-size: 2.5rem;
+}
+
+.disclaimer-alert {
+    background-color: #fff8e6;
+    border: 1px solid #ffe1a1;
+    border-radius: 0.85rem;
+    color: #6e5000;
+}
+
+.profile-meta {
+    border-top: 1px solid #e5e7eb;
+    padding-top: 1rem;
+}
+
+.footer-section {
+    background-color: var(--finance-navy);
+    color: #cbd5e1;
+}
+
+.footer-section p:first-child {
+    color: #ffffff;
+}
+
+@media (max-width: 991px) {
+    .dashboard-welcome {
+        align-items: flex-start;
+        display: block;
+    }
+}
+
+@media (max-width: 576px) {
+    .auth-section {
+        padding: 1.5rem 0;
+    }
+
+    .dashboard-section {
+        padding-top: 1.5rem !important;
+    }
+
+    .statistic-value {
+        font-size: 1.75rem;
+    }
+}

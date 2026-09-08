@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+{% block title %}{{ symbol }} — AI Stock Analysis{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <a href="{% url 'stocks:search' %}" class="text-decoration-none">&larr; New search</a>
+
+  {% if error %}
+    <div class="alert alert-warning mt-4">{{ error }}</div>
+  {% else %}
+
+  <div class="d-flex justify-content-between align-items-start mt-3 mb-4">
+    <div>
+      <h1 class="mb-0">{{ fundamentals.company_name|default:symbol }}</h1>
+      <span class="text-muted">{{ symbol }} · {{ fundamentals.sector|default:"Data unavailable" }}</span>
+    </div>
+    <div class="text-end">
+      <div class="display-6">₹{{ quote.current_price }}</div>
+      <span class="badge {% if analysis.classification == 'STRONG' or analysis.classification == 'POSITIVE' %}text-bg-success{% elif analysis.classification == 'HIGH RISK' %}text-bg-danger{% elif analysis.classification == 'CAUTION' %}text-bg-warning{% else %}text-bg-secondary{% endif %}">
+        {{ analysis.classification }}
+      </span>
+    </div>
+  </div>
+
+  {% if analysis.source == "rule_based" %}
+    <div class="alert alert-info small">
+      AI provider not configured — showing a transparent rule-based educational score instead of an AI-generated one.
+    </div>
+  {% endif %}
+
+  <!-- Scores -->
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+      <div class="card text-center p-3">
+        <div class="text-muted small">Fundamental</div>
+        <div class="fs-3 fw-bold">{{ analysis.fundamental_score|default:"—" }}<span class="fs-6 text-muted">/100</span></div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card text-center p-3">
+        <div class="text-muted small">Technical</div>
+        <div class="fs-3 fw-bold">{{ analysis.technical_score|default:"—" }}<span class="fs-6 text-muted">/100</span></div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card text-center p-3">
+        <div class="text-muted small">Risk</div>
+        <div class="fs-3 fw-bold">{{ analysis.risk_score|default:"—" }}<span class="fs-6 text-muted">/100</span></div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card text-center p-3 border-primary">
+        <div class="text-muted small">Overall</div>
+        <div class="fs-3 fw-bold text-primary">{{ analysis.overall_score|default:"—" }}<span class="fs-6 text-muted">/100</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart -->
+  <div class="card p-3 mb-4">
+    <canvas id="priceChart" height="90"></canvas>
+  </div>
+
+  <!-- Fundamentals table -->
+  <div class="card p-3 mb-4">
+    <h5>Fundamentals</h5>
+    <table class="table table-sm mb-0">
+      <tr><th>P/E</th><td>{{ fundamentals.pe_ratio }}</td><th>ROE</th><td>{{ fundamentals.roe }}</td></tr>
+      <tr><th>EPS</th><td>{{ fundamentals.eps }}</td><th>Debt/Equity</th><td>{{ fundamentals.debt_to_equity }}</td></tr>
+      <tr><th>Dividend Yield</th><td>{{ fundamentals.dividend_yield }}</td><th>Book Value</th><td>{{ fundamentals.book_value }}</td></tr>
+      <tr><th>Market Cap</th><td>{{ quote.market_cap }}</td><th>52W High/Low</th><td>{{ quote.fifty_two_week_high }} / {{ quote.fifty_two_week_low }}</td></tr>
+    </table>
+  </div>
+
+  <!-- AI Analysis -->
+  <div class="card p-4 mb-4">
+    <h5>AI Analysis</h5>
+    <p class="text-muted">{{ analysis.company_overview }}</p>
+
+    <div class="row">
+      <div class="col-md-6">
+        <h6>Strengths</h6>
+        <ul>{% for s in analysis.strengths %}<li>{{ s }}</li>{% endfor %}</ul>
+        <h6>Opportunities</h6>
+        <ul>{% for o in analysis.opportunities %}<li>{{ o }}</li>{% endfor %}</ul>
+      </div>
+      <div class="col-md-6">
+        <h6>Weaknesses</h6>
+        <ul>{% for w in analysis.weaknesses %}<li>{{ w }}</li>{% endfor %}</ul>
+        <h6>Risks</h6>
+        <ul>{% for r in analysis.risks %}<li>{{ r }}</li>{% endfor %}</ul>
+      </div>
+    </div>
+
+    <h6>Conclusion</h6>
+    <p>{{ analysis.conclusion }}</p>
+
+    <form method="post" action="{% url 'stocks:save_analysis' symbol %}">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-primary">Save Analysis</button>
+    </form>
+  </div>
+
+  <div class="alert alert-secondary small">
+    <strong>Disclaimer:</strong> Educational analysis only, not financial advice.
+    Past performance does not guarantee future returns.
+  </div>
+
+  {% endif %}
+</div>
+
+{% if not error %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+  const histData = {{ historical_json|safe }};
+  const ctx = document.getElementById('priceChart');
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: histData.labels,
+      datasets: [{
+        label: '{{ symbol }} Price (₹)',
+        data: histData.prices,
+        borderWidth: 2,
+        tension: 0.25,
+        pointRadius: 0,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: true } },
+      scales: { y: { beginAtZero: false } }
+    }
+  });
+</script>
+{% endif %}
+{% endblock %}

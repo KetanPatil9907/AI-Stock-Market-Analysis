@@ -1,0 +1,546 @@
+/* =========================================================
+   AI FINANCE ASSISTANT DASHBOARD
+   ========================================================= */
+
+.finance-dashboard {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 24px 32px 50px;
+}
+
+
+/* =========================================================
+   HERO
+   ========================================================= */
+
+.dashboard-hero {
+    position: relative;
+    min-height: 105px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    overflow: hidden;
+    margin-bottom: 22px;
+}
+
+.dashboard-badge {
+    display: inline-block;
+    background: #e5eef2;
+    color: #49616a;
+    font-size: 12px;
+    padding: 5px 10px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+}
+
+.dashboard-hero h1 {
+    margin: 0;
+    font-size: 30px;
+    font-weight: 700;
+    color: #101827;
+}
+
+.dashboard-hero p {
+    margin: 5px 0 0;
+    font-size: 14px;
+    color: #52606d;
+}
+
+.hero-decoration {
+    position: absolute;
+    right: 40px;
+    top: 10px;
+    font-size: 100px;
+    opacity: .035;
+}
+
+
+/* =========================================================
+   STAT CARDS
+   ========================================================= */
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+.stat-card {
+    min-height: 155px;
+    background: rgba(255,255,255,.95);
+    border: 1px solid #dfe5e9;
+    border-radius: 12px;
+    padding: 15px 17px;
+    box-shadow: 0 4px 14px rgba(20,30,40,.07);
+    transition: .25s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 22px rgba(20,30,40,.11);
+}
+
+.stat-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.stat-icon {
+    width: 34px;
+    height: 34px;
+    border: 1px solid #9aaab2;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+.stat-title {
+    margin-top: 12px;
+    font-size: 13px;
+    color: #4f5d67;
+}
+
+.stat-number {
+    margin-top: 2px;
+    font-size: 28px;
+    font-weight: 700;
+    color: #162333;
+}
+
+.stat-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 5px;
+    font-size: 11px;
+    color: #77838c;
+}
+
+.stat-footer i {
+    font-size: 16px;
+}
+
+
+/* =========================================================
+   MINI CHART
+   ========================================================= */
+
+.mini-chart {
+    width: 70px;
+    height: 35px;
+    color: #253d51;
+}
+
+.mini-chart svg {
+    width: 100%;
+    height: 100%;
+}
+
+
+/* =========================================================
+   CIRCLE CHARTS
+   ========================================================= */
+
+.circle-chart {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 4px solid #d8e0e3;
+    border-top-color: #37a55b;
+    border-right-color: #37a55b;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 0;
+}
+
+.investment-circle {
+    border-top-color: #188f92;
+}
+
+.saved-circle {
+    border-top-color: #71357e;
+    border-right-color: #71357e;
+}
+
+
+/* =========================================================
+   MAIN GRID
+   ========================================================= */
+
+.dashboard-main-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(280px, .9fr);
+    gap: 16px;
+}
+
+
+/* =========================================================
+   TOOLS
+   ========================================================= */
+
+.tools-section {
+    background: #e4f0f5;
+    border: 1px solid #c5d5dc;
+    border-radius: 11px;
+    padding: 16px;
+}
+
+.section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+}
+
+.section-heading h2 {
+    margin: 0;
+    font-size: 19px;
+    font-weight: 700;
+    color: #1a2735;
+}
+
+.section-heading p {
+    margin: 2px 0 0;
+    font-size: 12px;
+    color: #63717b;
+}
+
+.compass-icon {
+    width: 31px;
+    height: 31px;
+    border: 1px solid #718691;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+/* =========================================================
+   TOOL CARDS
+   ========================================================= */
+
+.tools-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 13px;
+}
+
+.tool-card {
+    overflow: hidden;
+    background: #fff;
+    border-radius: 10px;
+    border: 1px solid #dbe2e5;
+    text-decoration: none;
+    color: inherit;
+    box-shadow: 0 3px 10px rgba(20,30,40,.07);
+    transition: .25s ease;
+}
+
+.tool-card:hover {
+    transform: translateY(-3px);
+    color: inherit;
+    box-shadow: 0 8px 18px rgba(20,30,40,.12);
+}
+
+.tool-image {
+    height: 120px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+
+/* =========================================================
+   RISK IMAGE
+   ========================================================= */
+
+.risk-image {
+    background: #f8faf9;
+}
+
+.risk-gauge {
+    width: 130px;
+    height: 65px;
+    border-radius: 130px 130px 0 0;
+    border: 13px solid #e3e9e5;
+    border-bottom: 0;
+    border-left-color: #e85b3e;
+    border-top-color: #edb839;
+    border-right-color: #35aa70;
+    position: relative;
+}
+
+.gauge-value {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    bottom: -7px;
+    font-size: 11px;
+}
+
+.gauge-value strong {
+    display: block;
+    font-size: 16px;
+}
+
+
+/* =========================================================
+   AI IMAGE
+   ========================================================= */
+
+.ai-image {
+    background: #202126;
+}
+
+.ai-window {
+    width: 82%;
+    height: 78%;
+    display: flex;
+    border-radius: 6px;
+    background: #292a30;
+    padding: 7px;
+    box-shadow: 0 5px 18px rgba(0,0,0,.35);
+}
+
+.ai-sidebar {
+    width: 24%;
+    border-right: 1px solid #44454d;
+}
+
+.ai-content {
+    flex: 1;
+    padding: 8px;
+}
+
+.ai-line {
+    height: 5px;
+    width: 70%;
+    background: #565861;
+    margin-bottom: 7px;
+    border-radius: 5px;
+}
+
+.ai-line.short {
+    width: 42%;
+}
+
+.ai-line.medium {
+    width: 56%;
+}
+
+.ai-boxes {
+    display: flex;
+    gap: 5px;
+    margin: 12px 0;
+}
+
+.ai-boxes span {
+    width: 25px;
+    height: 18px;
+    background: #454750;
+    border-radius: 3px;
+}
+
+
+/* =========================================================
+   TOOL CONTENT
+   ========================================================= */
+
+.tool-content {
+    padding: 12px 14px 14px;
+}
+
+.tool-content h3 {
+    margin: 0 0 4px;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.tool-content p {
+    margin: 0;
+    color: #5d6971;
+    font-size: 11px;
+    line-height: 1.4;
+}
+
+
+/* =========================================================
+   QUICK ACTIONS
+   ========================================================= */
+
+.quick-actions {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 13px;
+}
+
+.quick-action {
+    background: white;
+    border: 1px solid #d5dfe4;
+    border-radius: 8px;
+    padding: 10px;
+    text-decoration: none;
+    color: #273642;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    font-size: 12px;
+    transition: .2s;
+}
+
+.quick-action:hover {
+    background: #f7fafb;
+    color: #0d6efd;
+}
+
+.quick-action i {
+    font-size: 16px;
+}
+
+
+/* =========================================================
+   ACTIVITY
+   ========================================================= */
+
+.activity-card {
+    background: white;
+    border: 1px solid #d8e0e4;
+    border-radius: 11px;
+    padding: 17px;
+    box-shadow: 0 4px 12px rgba(20,30,40,.06);
+}
+
+.activity-header h2 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.activity-header p {
+    margin: 3px 0 17px;
+    font-size: 11px;
+    color: #65717a;
+}
+
+.activity-list {
+    position: relative;
+}
+
+.activity-list::before {
+    content: "";
+    position: absolute;
+    left: 16px;
+    top: 10px;
+    bottom: 15px;
+    width: 1px;
+    background: #d7dfe3;
+}
+
+.activity-item {
+    position: relative;
+    display: flex;
+    gap: 10px;
+    margin-bottom: 18px;
+}
+
+.activity-icon {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 13px;
+    z-index: 1;
+}
+
+.activity-icon.blue {
+    background: #313b74;
+}
+
+.activity-icon.green {
+    background: #31864b;
+}
+
+.activity-icon.red {
+    background: #963f3f;
+}
+
+.activity-icon.cyan {
+    background: #27869b;
+}
+
+.activity-text p {
+    margin: 2px 0 3px;
+    font-size: 11px;
+    line-height: 1.35;
+    color: #303d46;
+}
+
+.activity-text span {
+    color: #8a949a;
+    font-size: 9px;
+}
+
+.view-all {
+    display: block;
+    text-align: center;
+    padding-top: 8px;
+    color: #1769d1;
+    font-size: 12px;
+    text-decoration: none;
+}
+
+.view-all:hover {
+    text-decoration: underline;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1000px) {
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .dashboard-main-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+@media (max-width: 650px) {
+
+    .finance-dashboard {
+        padding: 18px 14px 35px;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .tools-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .quick-actions {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-hero h1 {
+        font-size: 25px;
+    }
+
+}

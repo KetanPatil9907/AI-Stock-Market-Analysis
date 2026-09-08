@@ -1,0 +1,726 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Create Account | AI Finance Assistant{% endblock %}
+
+
+{% block navbar %}
+{% endblock %}
+
+
+{% block footer %}
+{% endblock %}
+
+
+{% block extra_css %}
+
+<style>
+
+    .register-page {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 30px;
+        background: #eef4ff;
+    }
+
+    .register-wrapper {
+        width: 100%;
+        max-width: 1100px;
+        background: white;
+        border-radius: 14px;
+        overflow: hidden;
+        display: flex;
+        box-shadow: 0 20px 50px rgba(20, 60, 120, 0.18);
+    }
+
+
+    /* LEFT */
+
+    .register-brand {
+        width: 50%;
+        background: linear-gradient(
+            145deg,
+            #0647b8,
+            #0866ed
+        );
+        color: white;
+        padding: 42px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .register-brand::before {
+        content: "";
+        position: absolute;
+        width: 400px;
+        height: 400px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.05);
+        top: -160px;
+        left: -160px;
+    }
+
+    .register-brand::after {
+        content: "";
+        position: absolute;
+        width: 400px;
+        height: 400px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.05);
+        bottom: -220px;
+        left: -80px;
+    }
+
+    .register-brand-content {
+        position: relative;
+        z-index: 2;
+    }
+
+
+    .register-logo {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 55px;
+    }
+
+    .register-logo-icon {
+        width: 43px;
+        height: 43px;
+        background: rgba(255,255,255,0.18);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 23px;
+    }
+
+    .register-logo h2 {
+        font-size: 21px;
+        margin: 0;
+        font-weight: 700;
+    }
+
+    .register-logo small {
+        font-size: 10px;
+        opacity: .8;
+    }
+
+
+    .register-graphic {
+        text-align: center;
+        margin-bottom: 35px;
+    }
+
+    .register-graphic-icon {
+        width: 170px;
+        height: 170px;
+        background: rgba(255,255,255,0.94);
+        border-radius: 25px;
+        margin: auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 15px 30px rgba(0,0,0,.12);
+    }
+
+    .register-graphic-icon i {
+        font-size: 85px;
+        color: #1266ed;
+    }
+
+
+    .register-message {
+        text-align: center;
+    }
+
+    .register-message h1 {
+        font-size: 23px;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+    .register-message p {
+        max-width: 370px;
+        margin: auto;
+        font-size: 13px;
+        line-height: 1.7;
+        opacity: .88;
+    }
+
+
+    /* RIGHT */
+
+    .register-form-panel {
+        width: 50%;
+        padding: 45px 70px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .register-form-content {
+        width: 100%;
+        max-width: 420px;
+    }
+
+
+    .register-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: linear-gradient(
+            135deg,
+            #1769ff,
+            #4c54f5
+        );
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 21px;
+        margin: auto auto 14px;
+    }
+
+
+    .register-heading {
+        text-align: center;
+        margin-bottom: 22px;
+    }
+
+    .register-heading h1 {
+        font-size: 26px;
+        font-weight: 700;
+        color: #102b52;
+        margin-bottom: 6px;
+    }
+
+    .register-heading p {
+        color: #7c899c;
+        font-size: 12px;
+        margin: 0;
+    }
+
+
+    .register-form-content .form-label {
+        color: #172b4d;
+        font-size: 12px;
+        margin-bottom: 5px;
+    }
+
+
+    .register-input {
+        width: 100%;
+        height: 42px;
+        border: 1px solid #dce3ed;
+        border-radius: 7px;
+        padding: 0 12px;
+        font-size: 12px;
+        outline: none;
+    }
+
+    .register-input:focus {
+        border-color: #216bff;
+        box-shadow: 0 0 0 3px rgba(33,107,255,.10);
+    }
+
+
+    .register-password-wrapper {
+        position: relative;
+    }
+
+    .register-password-wrapper .register-input {
+        padding-right: 42px;
+    }
+
+    .register-eye {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        border: none;
+        background: transparent;
+        color: #8491a5;
+        cursor: pointer;
+    }
+
+
+    .register-submit {
+        width: 100%;
+        height: 43px;
+        border: none;
+        border-radius: 7px;
+        background: linear-gradient(
+            135deg,
+            #1260ed,
+            #0865f4
+        );
+        color: white;
+        font-weight: 600;
+        font-size: 13px;
+        margin-top: 5px;
+        box-shadow: 0 6px 15px rgba(20,96,237,.20);
+    }
+
+    .register-submit:hover {
+        transform: translateY(-1px);
+    }
+
+
+    .register-error {
+        color: #dc3545;
+        font-size: 10px;
+        margin-top: 4px;
+    }
+
+    .register-help {
+        font-size: 10px;
+        color: #8995a6;
+        margin-top: 4px;
+    }
+
+
+    .register-divider {
+        height: 1px;
+        background: #e1e5eb;
+        margin: 20px 0;
+    }
+
+
+    .register-bottom {
+        text-align: center;
+        color: #8995a6;
+        font-size: 12px;
+    }
+
+    .register-bottom a {
+        color: #0865ed;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+
+    @media (max-width: 850px) {
+
+        .register-page {
+            padding: 15px;
+        }
+
+        .register-wrapper {
+            max-width: 500px;
+        }
+
+        .register-brand {
+            display: none;
+        }
+
+        .register-form-panel {
+            width: 100%;
+            padding: 40px 30px;
+        }
+
+    }
+
+
+    @media (max-width: 480px) {
+
+        .register-page {
+            padding: 0;
+        }
+
+        .register-wrapper {
+            min-height: 100vh;
+            border-radius: 0;
+        }
+
+        .register-form-panel {
+            padding: 30px 22px;
+        }
+
+    }
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="register-page">
+
+    <div class="register-wrapper">
+
+
+        <!-- ================= LEFT ================= -->
+
+        <div class="register-brand">
+
+            <div class="register-brand-content">
+
+                <div class="register-logo">
+
+                    <div class="register-logo-icon">
+                        <i class="bi bi-graph-up-arrow"></i>
+                    </div>
+
+                    <div>
+                        <h2>AI Finance Assistant</h2>
+
+                        <small>
+                            Smarter Insights. Better Financial Decisions.
+                        </small>
+                    </div>
+
+                </div>
+
+
+                <div class="register-graphic">
+
+                    <div class="register-graphic-icon">
+
+                        <i class="bi bi-person-plus-fill"></i>
+
+                    </div>
+
+                </div>
+
+
+                <div class="register-message">
+
+                    <h1>
+                        Start Your Financial Journey
+                    </h1>
+
+                    <p>
+                        Create your account and explore
+                        AI-powered stock analysis, IPO insights,
+                        investment planning and financial education.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================= RIGHT ================= -->
+
+        <div class="register-form-panel">
+
+            <div class="register-form-content">
+
+                <div class="register-icon">
+
+                    <i class="bi bi-person-plus-fill"></i>
+
+                </div>
+
+
+                <div class="register-heading">
+
+                    <h1>
+                        Create your account
+                    </h1>
+
+                    <p>
+                        Join AI Finance Assistant today.
+                    </p>
+
+                </div>
+
+
+                <form method="post" novalidate>
+
+                    {% csrf_token %}
+
+
+                    <!-- Non Field Errors -->
+
+                    {% if form.non_field_errors %}
+
+                        <div class="alert alert-danger register-error">
+
+                            {% for error in form.non_field_errors %}
+
+                                <div>
+                                    {{ error }}
+                                </div>
+
+                            {% endfor %}
+
+                        </div>
+
+                    {% endif %}
+
+
+                    <!-- Full Name -->
+
+                    <div class="mb-2">
+
+                        <label
+                            class="form-label fw-semibold"
+                            for="{{ form.full_name.id_for_label }}"
+                        >
+                            Full Name
+                        </label>
+
+                        <input
+                            type="text"
+                            name="full_name"
+                            id="{{ form.full_name.id_for_label }}"
+                            class="register-input"
+                            placeholder="Enter your full name"
+                            autocomplete="name"
+                            value="{{ form.full_name.value|default:'' }}"
+                            required
+                        >
+
+                        {% for error in form.full_name.errors %}
+
+                            <div class="register-error">
+                                {{ error }}
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+
+                    <!-- Age -->
+
+                    <div class="mb-2">
+
+                        <label
+                            class="form-label fw-semibold"
+                            for="{{ form.age.id_for_label }}"
+                        >
+                            Age
+                        </label>
+
+                        <input
+                            type="number"
+                            name="age"
+                            id="{{ form.age.id_for_label }}"
+                            class="register-input"
+                            placeholder="18"
+                            min="18"
+                            max="120"
+                            value="{{ form.age.value|default:'' }}"
+                            required
+                        >
+
+                        {% for error in form.age.errors %}
+
+                            <div class="register-error">
+                                {{ error }}
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+
+                    <!-- Email -->
+
+                    <div class="mb-2">
+
+                        <label
+                            class="form-label fw-semibold"
+                            for="{{ form.email.id_for_label }}"
+                        >
+                            Email Address
+                        </label>
+
+                        <input
+                            type="email"
+                            name="email"
+                            id="{{ form.email.id_for_label }}"
+                            class="register-input"
+                            placeholder="name@example.com"
+                            autocomplete="email"
+                            value="{{ form.email.value|default:'' }}"
+                            required
+                        >
+
+                        {% for error in form.email.errors %}
+
+                            <div class="register-error">
+                                {{ error }}
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+
+                    <!-- Password -->
+
+                    <div class="mb-2">
+
+                        <label
+                            class="form-label fw-semibold"
+                            for="{{ form.password.id_for_label }}"
+                        >
+                            Password
+                        </label>
+
+                        <div class="register-password-wrapper">
+
+                            <input
+                                type="password"
+                                name="password"
+                                id="{{ form.password.id_for_label }}"
+                                class="register-input"
+                                placeholder="Create a secure password"
+                                autocomplete="new-password"
+                                required
+                            >
+
+                            <button
+                                type="button"
+                                class="register-eye"
+                                onclick="toggleRegisterPassword(
+                                    '{{ form.password.id_for_label }}',
+                                    this
+                                )"
+                            >
+                                <i class="bi bi-eye"></i>
+                            </button>
+
+                        </div>
+
+                        {% for error in form.password.errors %}
+
+                            <div class="register-error">
+                                {{ error }}
+                            </div>
+
+                        {% endfor %}
+
+                        <div class="register-help">
+                            Use at least 8 characters.
+                        </div>
+
+                    </div>
+
+
+                    <!-- Confirm Password -->
+
+                    <div class="mb-3">
+
+                        <label
+                            class="form-label fw-semibold"
+                            for="{{ form.confirm_password.id_for_label }}"
+                        >
+                            Confirm Password
+                        </label>
+
+                        <div class="register-password-wrapper">
+
+                            <input
+                                type="password"
+                                name="confirm_password"
+                                id="{{ form.confirm_password.id_for_label }}"
+                                class="register-input"
+                                placeholder="Repeat your password"
+                                autocomplete="new-password"
+                                required
+                            >
+
+                            <button
+                                type="button"
+                                class="register-eye"
+                                onclick="toggleRegisterPassword(
+                                    '{{ form.confirm_password.id_for_label }}',
+                                    this
+                                )"
+                            >
+                                <i class="bi bi-eye"></i>
+                            </button>
+
+                        </div>
+
+                        {% for error in form.confirm_password.errors %}
+
+                            <div class="register-error">
+                                {{ error }}
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+
+                    <!-- Submit -->
+
+                    <button
+                        type="submit"
+                        class="register-submit"
+                    >
+                        <i class="bi bi-person-plus me-2"></i>
+                        Create Account
+                    </button>
+
+                </form>
+
+
+                <div class="register-divider"></div>
+
+
+                <div class="register-bottom">
+
+                    Already have an account?
+
+                    <a href="{% url 'accounts:login' %}">
+                        Login here
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+
+<script>
+
+function toggleRegisterPassword(inputId, button) {
+
+    const input = document.getElementById(inputId);
+    const icon = button.querySelector("i");
+
+    if (input.type === "password") {
+
+        input.type = "text";
+
+        icon.classList.remove("bi-eye");
+        icon.classList.add("bi-eye-slash");
+
+    } else {
+
+        input.type = "password";
+
+        icon.classList.remove("bi-eye-slash");
+        icon.classList.add("bi-eye");
+
+    }
+
+}
+
+</script>
+
+{% endblock %}

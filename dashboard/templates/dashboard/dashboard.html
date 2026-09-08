@@ -1,0 +1,324 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard | AI Finance Assistant{% endblock %}
+
+{% block content %}
+<section class="dashboard-section py-4 py-lg-5">
+    <div class="container">
+
+        <div class="dashboard-welcome mb-4">
+            <div>
+                <span class="badge educational-badge mb-2">
+                    Educational Finance Platform
+                </span>
+
+                <h1 class="display-6 fw-bold mb-2">
+                    Welcome, {{ user.profile.full_name }}
+                </h1>
+
+                <p class="text-muted mb-0">
+                    Explore financial concepts and AI-powered educational
+                    analysis in one place.
+                </p>
+            </div>
+
+            <div class="text-lg-end mt-3 mt-lg-0">
+                <p class="small text-muted mb-0">
+                    <i class="bi bi-calendar3 me-1"></i>
+                    Member since {{ user.profile.created_at|date:"d M Y" }}
+                </p>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-5">
+            <div class="col-md-6 col-xl-3">
+                <div class="card statistic-card h-100 border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="statistic-icon bg-primary-subtle text-primary">
+                            <i class="bi bi-bar-chart-line"></i>
+                        </div>
+
+                        <p class="statistic-label mb-1">
+                            Stock Analyses
+                        </p>
+
+                        <h2 class="statistic-value">
+                            {{ total_stock_analyses }}
+                        </h2>
+
+                        <p class="small text-muted mb-0">
+                            Saved educational stock assessments
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-xl-3">
+                <div class="card statistic-card h-100 border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="statistic-icon bg-success-subtle text-success">
+                            <i class="bi bi-buildings"></i>
+                        </div>
+
+                        <p class="statistic-label mb-1">
+                            IPO Analyses
+                        </p>
+
+                        <h2 class="statistic-value">
+                            {{ total_ipo_analyses }}
+                        </h2>
+
+                        <p class="small text-muted mb-0">
+                            IPO research records will appear here
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-xl-3">
+                <div class="card statistic-card h-100 border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="statistic-icon bg-warning-subtle text-warning">
+                            <i class="bi bi-wallet2"></i>
+                        </div>
+
+                        <p class="statistic-label mb-1">
+                            Investment Plans
+                        </p>
+
+                        <h2 class="statistic-value">
+                            {{ total_investment_plans }}
+                        </h2>
+
+                        <p class="small text-muted mb-0">
+                            Educational allocation plans created
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-xl-3">
+                <div class="card statistic-card h-100 border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="statistic-icon bg-info-subtle text-info">
+                            <i class="bi bi-bookmark-star"></i>
+                        </div>
+
+                        <p class="statistic-label mb-1">
+                            Saved Analyses
+                        </p>
+
+                        <h2 class="statistic-value">
+                            {{ total_saved_analyses }}
+                        </h2>
+
+                        <p class="small text-muted mb-0">
+                            Important research saved for later
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm dashboard-panel h-100">
+                    <div class="card-header bg-white border-0 pt-4 px-4">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h2 class="h4 fw-bold mb-1">
+                                    Explore Finance Tools
+                                </h2>
+
+                                <p class="text-muted small mb-0">
+                                    Choose a learning or analysis module.
+                                </p>
+                            </div>
+
+                            <i class="bi bi-compass tool-header-icon"></i>
+                        </div>
+                    </div>
+
+                    <div class="card-body p-4">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="tool-card h-100">
+                                    <div class="tool-icon text-primary">
+                                        <i class="bi bi-graph-up-arrow"></i>
+                                    </div>
+
+                                    <h3 class="h5 fw-bold">
+                                        AI Stock Analysis
+                                    </h3>
+
+                                    <p class="small text-muted">
+                                        Review available company data,
+                                        fundamentals, trends, and risk
+                                        indicators using educational AI
+                                        analysis.
+                                    </p>
+
+                                    <span class="badge text-bg-light">
+                                        Coming in Phase 3
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="tool-card h-100">
+                                    <div class="tool-icon text-success">
+                                        <i class="bi bi-building"></i>
+                                    </div>
+
+                                    <h3 class="h5 fw-bold">
+                                        IPO Center
+                                    </h3>
+
+                                    <p class="small text-muted">
+                                        Learn IPO terminology, evaluate
+                                        available information, and understand
+                                        risks such as unofficial GMP data.
+                                    </p>
+
+                                    <span class="badge text-bg-light">
+                                        Coming later
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="tool-card h-100">
+                                    <div class="tool-icon text-warning">
+                                        <i class="bi bi-piggy-bank"></i>
+                                    </div>
+
+                                    <h3 class="h5 fw-bold">
+                                        Mutual Funds vs FD
+                                    </h3>
+
+                                    <p class="small text-muted">
+                                        Compare risk, liquidity, return
+                                        potential, taxation, and investor
+                                        suitability in simple language.
+                                    </p>
+
+                                    <span class="badge text-bg-light">
+                                        Coming later
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="tool-card h-100">
+                                    <div class="tool-icon text-danger">
+                                        <i class="bi bi-calculator"></i>
+                                    </div>
+
+                                    <h3 class="h5 fw-bold">
+                                        Money Planner
+                                    </h3>
+
+                                    <p class="small text-muted">
+                                        Generate an educational allocation
+                                        illustration based on amount,
+                                        duration, goal, and risk tolerance.
+                                    </p>
+
+                                    <span class="badge text-bg-light">
+                                        Coming later
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm dashboard-panel h-100">
+                    <div class="card-header bg-white border-0 pt-4 px-4">
+                        <h2 class="h4 fw-bold mb-1">
+                            Recent Activity
+                        </h2>
+
+                        <p class="text-muted small mb-0">
+                            Your most recent searches and analyses.
+                        </p>
+                    </div>
+
+                    <div class="card-body px-4 pb-4">
+                        {% if recent_activity %}
+                            <div class="activity-list">
+                                {% for activity in recent_activity %}
+                                    <div class="activity-item">
+                                        <div class="activity-item-icon">
+                                            {% if activity.activity_type == "STOCK_ANALYSIS" %}
+                                                <i class="bi bi-graph-up-arrow"></i>
+                                            {% elif activity.activity_type == "IPO_ANALYSIS" %}
+                                                <i class="bi bi-building"></i>
+                                            {% elif activity.activity_type == "INVESTMENT_PLAN" %}
+                                                <i class="bi bi-calculator"></i>
+                                            {% else %}
+                                                <i class="bi bi-clock-history"></i>
+                                            {% endif %}
+                                        </div>
+
+                                        <div class="flex-grow-1">
+                                            <p class="fw-semibold mb-0 small">
+                                                {{ activity.title }}
+                                            </p>
+
+                                            {% if activity.description %}
+                                                <p class="text-muted small mb-1">
+                                                    {{ activity.description|truncatechars:70 }}
+                                                </p>
+                                            {% endif %}
+
+                                            <p class="text-muted activity-time mb-0">
+                                                {{ activity.created_at|timesince }} ago
+                                            </p>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="empty-state text-center py-4">
+                                <div class="empty-state-icon mb-3">
+                                    <i class="bi bi-clock-history"></i>
+                                </div>
+
+                                <h3 class="h6 fw-bold">
+                                    No activity yet
+                                </h3>
+
+                                <p class="small text-muted mb-0">
+                                    Your stock, IPO, and investment-plan
+                                    activity will appear here after you start
+                                    using the modules.
+                                </p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="alert disclaimer-alert mt-4 mb-0">
+            <div class="d-flex align-items-start">
+                <i class="bi bi-info-circle-fill me-3 fs-5"></i>
+
+                <div>
+                    <strong>Financial Disclaimer:</strong>
+                    This platform provides educational information and
+                    AI-generated analysis for learning purposes only. It is
+                    not financial, investment, tax, or legal advice. Market
+                    data may be delayed, unavailable, or incomplete. Past
+                    performance does not guarantee future returns. Always
+                    conduct independent research and consult a qualified
+                    financial professional before making investment decisions.
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

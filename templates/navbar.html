@@ -1,0 +1,134 @@
+<nav class="navbar navbar-expand-lg navbar-dark finance-navbar sticky-top">
+    <div class="container">
+        <a
+            class="navbar-brand fw-bold"
+            href="{% if user.is_authenticated %}{% url 'dashboard:home' %}{% else %}{% url 'accounts:login' %}{% endif %}"
+        >
+            <i class="bi bi-graph-up-arrow me-2"></i>
+            AI Finance Assistant
+        </a>
+
+        <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#mainNavbar"
+            aria-controls="mainNavbar"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+        >
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div
+            class="collapse navbar-collapse"
+            id="mainNavbar"
+        >
+            <ul class="navbar-nav ms-auto align-items-lg-center">
+                {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a
+                            class="nav-link"
+                            href="{% url 'dashboard:home' %}"
+                        >
+                            <i class="bi bi-grid me-1"></i>
+                            Dashboard
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <span class="nav-link nav-link-disabled">
+                            Stocks
+                        </span>
+                    </li>
+
+                    <li class="nav-item">
+                        <span class="nav-link nav-link-disabled">
+                            IPO Center
+                        </span>
+                    </li>
+
+                    <li class="nav-item">
+                        <span class="nav-link nav-link-disabled">
+                            Money Planner
+                        </span>
+                    </li>
+
+                    <li class="nav-item dropdown ms-lg-2">
+                        <a
+                            class="nav-link dropdown-toggle"
+                            href="#"
+                            role="button"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                        >
+                            <i class="bi bi-person-circle me-1"></i>
+                            {{ user.profile.full_name }}
+                        </a>
+
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                            <li>
+                                <a
+                                    class="dropdown-item"
+                                    href="{% url 'accounts:profile' %}"
+                                >
+                                    <i class="bi bi-person me-2"></i>
+                                    My Profile
+                                </a>
+                            </li>
+
+                            <li>
+                                <a
+                                    class="dropdown-item"
+                                    href="{% url 'accounts:password_change' %}"
+                                >
+                                    <i class="bi bi-key me-2"></i>
+                                    Change Password
+                                </a>
+                            </li>
+
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+
+                            <li>
+                                <form
+                                    method="post"
+                                    action="{% url 'accounts:logout' %}"
+                                >
+                                    {% csrf_token %}
+
+                                    <button
+                                        type="submit"
+                                        class="dropdown-item text-danger"
+                                    >
+                                        <i class="bi bi-box-arrow-right me-2"></i>
+                                        Logout
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a
+                            class="nav-link"
+                            href="{% url 'accounts:login' %}"
+                        >
+                            Login
+                        </a>
+                    </li>
+
+                    <li class="nav-item ms-lg-2">
+                        <a
+                            class="btn btn-light btn-sm px-3"
+                            href="{% url 'accounts:register' %}"
+                        >
+                            Create Account
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>

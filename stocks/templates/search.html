@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}AI Stock Analysis{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <h1 class="mb-2">AI Stock Analysis</h1>
+  <p class="text-muted mb-4">Search any NSE-listed company for an educational, AI-powered breakdown.</p>
+
+  <form method="get" class="row g-2 mb-4" style="max-width: 600px;">
+    <div class="col-9">
+      {{ form.symbol }}
+      {% if form.symbol.errors %}
+        <div class="text-danger small mt-1">{{ form.symbol.errors.0 }}</div>
+      {% endif %}
+    </div>
+    <div class="col-3">
+      <button type="submit" class="btn btn-primary btn-lg w-100">Analyze</button>
+    </div>
+  </form>
+
+  <div class="d-flex flex-wrap gap-2 mb-4">
+    <a href="{% url 'stocks:analysis_detail' 'RELIANCE' %}" class="badge text-bg-light border text-decoration-none px-3 py-2">RELIANCE</a>
+    <a href="{% url 'stocks:analysis_detail' 'TCS' %}" class="badge text-bg-light border text-decoration-none px-3 py-2">TCS</a>
+    <a href="{% url 'stocks:analysis_detail' 'INFY' %}" class="badge text-bg-light border text-decoration-none px-3 py-2">INFY</a>
+    <a href="{% url 'stocks:analysis_detail' 'HDFCBANK' %}" class="badge text-bg-light border text-decoration-none px-3 py-2">HDFCBANK</a>
+    <a href="{% url 'stocks:analysis_detail' 'ITC' %}" class="badge text-bg-light border text-decoration-none px-3 py-2">ITC</a>
+    <a href="{% url 'stocks:analysis_detail' 'SBIN' %}" class="badge text-bg-light border text-decoration-none px-3 py-2">SBIN</a>
+  </div>
+
+  <a href="{% url 'stocks:compare' %}" class="btn btn-outline-secondary">Compare Stocks →</a>
+
+  <div class="alert alert-secondary mt-5 small">
+    <strong>Disclaimer:</strong> This platform provides educational information and AI-generated
+    analysis for learning purposes only. It is not financial, investment, tax, or legal advice.
+    Market data may be delayed or incomplete. Always conduct independent research and consult a
+    qualified financial professional before making investment decisions.
+  </div>
+</div>
+{% endblock %}

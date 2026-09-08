@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Compare Stocks{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <h1 class="mb-4">Compare Stocks</h1>
+
+  <form method="get" class="row g-2 mb-4" style="max-width: 600px;">
+    <div class="col-9">{{ form.symbols }}</div>
+    <div class="col-3"><button class="btn btn-primary w-100" type="submit">Compare</button></div>
+  </form>
+  {% if form.symbols.errors %}<div class="text-danger small mb-3">{{ form.symbols.errors.0 }}</div>{% endif %}
+
+  {% if results %}
+  <div class="table-responsive">
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>Metric</th>
+          {% for r in results %}<th>{{ r.symbol }}</th>{% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        <tr><th>Price</th>{% for r in results %}<td>{% if r.error %}{{ r.error }}{% else %}₹{{ r.current_price }}{% endif %}</td>{% endfor %}</tr>
+        <tr><th>Market Cap</th>{% for r in results %}<td>{{ r.market_cap|default:"—" }}</td>{% endfor %}</tr>
+        <tr><th>P/E</th>{% for r in results %}<td>{{ r.pe_ratio|default:"—" }}</td>{% endfor %}</tr>
+        <tr><th>EPS</th>{% for r in results %}<td>{{ r.eps|default:"—" }}</td>{% endfor %}</tr>
+        <tr><th>ROE</th>{% for r in results %}<td>{{ r.roe|default:"—" }}</td>{% endfor %}</tr>
+        <tr><th>Debt/Equity</th>{% for r in results %}<td>{{ r.debt_to_equity|default:"—" }}</td>{% endfor %}</tr>
+        <tr><th>Dividend Yield</th>{% for r in results %}<td>{{ r.dividend_yield|default:"—" }}</td>{% endfor %}</tr>
+        <tr><th>52W High/Low</th>{% for r in results %}<td>{{ r.fifty_two_week_high|default:"—" }} / {{ r.fifty_two_week_low|default:"—" }}</td>{% endfor %}</tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="text-muted small">Based on the available data. This is not a recommendation to buy or sell any stock.</p>
+  {% endif %}
+</div>
+{% endblock %}
