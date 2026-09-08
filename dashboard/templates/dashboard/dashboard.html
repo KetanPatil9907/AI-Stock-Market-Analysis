@@ -54,26 +54,28 @@
             </div>
 
             <div class="col-md-6 col-xl-3">
-                <div class="card statistic-card h-100 border-0 shadow-sm">
-                    <div class="card-body">
-                        <div class="statistic-icon bg-success-subtle text-success">
-                            <i class="bi bi-buildings"></i>
-                        </div>
-
-                        <p class="statistic-label mb-1">
-                            IPO Analyses
-                        </p>
-
-                        <h2 class="statistic-value">
-                            {{ total_ipo_analyses }}
-                        </h2>
-
-                        <p class="small text-muted mb-0">
-                            IPO research records will appear here
-                        </p>
-                    </div>
+    <a href="{% url 'stocks:search' %}" class="text-decoration-none text-dark">
+        <div class="card statistic-card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <div class="statistic-icon bg-primary-subtle text-primary">
+                    <i class="bi bi-bar-chart-line"></i>
                 </div>
+
+                <p class="statistic-label mb-1">
+                    Stock Analyses
+                </p>
+
+                <h2 class="statistic-value">
+                    {{ total_stock_analyses }}
+                </h2>
+
+                <p class="small text-muted mb-0">
+                    Saved educational stock assessments
+                </p>
             </div>
+        </div>
+    </a>
+</div>
 
             <div class="col-md-6 col-xl-3">
                 <div class="card statistic-card h-100 border-0 shadow-sm">
@@ -165,26 +167,30 @@
                             </div>
 
                             <div class="col-md-6">
-                                <div class="tool-card h-100">
-                                    <div class="tool-icon text-success">
-                                        <i class="bi bi-building"></i>
-                                    </div>
+    <a href="{% url 'stocks:search' %}" class="text-decoration-none text-dark">
+        <div class="tool-card h-100">
+            <div class="tool-icon text-primary">
+                <i class="bi bi-graph-up-arrow"></i>
+            </div>
 
-                                    <h3 class="h5 fw-bold">
-                                        IPO Center
-                                    </h3>
+            <h3 class="h5 fw-bold">
+                AI Stock Analysis
+            </h3>
 
-                                    <p class="small text-muted">
-                                        Learn IPO terminology, evaluate
-                                        available information, and understand
-                                        risks such as unofficial GMP data.
-                                    </p>
+            <p class="small text-muted">
+                Review available company data,
+                fundamentals, trends, and risk
+                indicators using educational AI
+                analysis.
+            </p>
 
-                                    <span class="badge text-bg-light">
-                                        Coming later
-                                    </span>
-                                </div>
-                            </div>
+            <span class="badge text-bg-primary">
+                Open Stock Analysis
+            </span>
+        </div>
+    </a>
+</div>
+                            
 
                             <div class="col-md-6">
                                 <div class="tool-card h-100">

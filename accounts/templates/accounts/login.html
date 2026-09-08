@@ -3,495 +3,420 @@
 
 {% block title %}Login | AI Finance Assistant{% endblock %}
 
-
 {% block navbar %}
 {% endblock %}
-
 
 {% block footer %}
 {% endblock %}
 
-
 {% block extra_css %}
-
 <style>
 
-    body {
-        margin: 0;
-        background: #eef4ff;
-    }
+body {
+    margin: 0;
+    background: #eef4ff;
+}
+
+.auth-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+}
+
+.auth-wrapper {
+    width: 100%;
+    max-width: 1100px;
+    min-height: 650px;
+    background: white;
+    border-radius: 14px;
+    overflow: hidden;
+    display: flex;
+    box-shadow: 0 20px 50px rgba(20, 60, 120, 0.18);
+}
+
+.auth-brand {
+    width: 50%;
+    background: linear-gradient(145deg, #0647b8, #0866ed);
+    color: white;
+    padding: 42px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.auth-brand::before {
+    content: "";
+    position: absolute;
+    width: 380px;
+    height: 380px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.05);
+    top: -100px;
+    left: -150px;
+}
+
+.auth-brand::after {
+    content: "";
+    position: absolute;
+    width: 420px;
+    height: 420px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.06);
+    bottom: -230px;
+    left: -80px;
+}
+
+.brand-logo {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.brand-logo-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.18);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+}
+
+.brand-logo h2 {
+    margin: 0;
+    font-size: 21px;
+    font-weight: 700;
+}
+
+.brand-logo small {
+    display: block;
+    font-size: 10px;
+    opacity: 0.8;
+    margin-top: 2px;
+}
+
+.finance-illustration {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    margin-top: 25px;
+}
+
+.chart-box {
+    width: 250px;
+    height: 170px;
+    margin: auto;
+    background: rgba(255,255,255,0.95);
+    border-radius: 15px;
+    position: relative;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chart-box i {
+    font-size: 105px;
+    color: #1582ff;
+}
+
+.coin {
+    position: absolute;
+    bottom: -15px;
+    left: 35px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #f6b91a;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 20px;
+    box-shadow: 0 5px 10px rgba(0,0,0,0.15);
+}
+
+.coin.second {
+    width: 38px;
+    height: 38px;
+    left: 72px;
+    bottom: -5px;
+    background: #f8cf35;
+}
+
+.brand-description {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    margin-top: 25px;
+}
+
+.brand-description h1 {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.brand-description p {
+    font-size: 13px;
+    line-height: 1.7;
+    opacity: 0.88;
+    max-width: 360px;
+    margin: auto;
+}
+
+.brand-features {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    margin-top: 30px;
+}
+
+.brand-feature {
+    flex: 1;
+    text-align: center;
+    padding: 0 15px;
+    border-right: 1px solid rgba(255,255,255,0.25);
+}
+
+.brand-feature:last-child {
+    border-right: none;
+}
+
+.brand-feature i {
+    font-size: 19px;
+    display: block;
+    margin-bottom: 6px;
+}
+
+.brand-feature span {
+    font-size: 10px;
+    opacity: 0.85;
+}
+
+.auth-form-panel {
+    width: 50%;
+    padding: 60px 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+}
+
+.auth-form-content {
+    width: 100%;
+    max-width: 400px;
+}
+
+.auth-top-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1769ff, #4c54f5);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 23px;
+    margin: 0 auto 18px;
+    box-shadow: 0 7px 18px rgba(23,105,255,0.25);
+}
+
+.auth-heading {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.auth-heading h1 {
+    font-size: 27px;
+    font-weight: 700;
+    color: #102b52;
+    margin-bottom: 7px;
+}
+
+.auth-heading p {
+    font-size: 13px;
+    color: #7c899c;
+    margin: 0;
+}
+
+.auth-form-content .form-label {
+    color: #172b4d;
+    font-size: 13px;
+    margin-bottom: 7px;
+}
+
+.auth-input {
+    width: 100%;
+    height: 46px;
+    border: 1px solid #dce3ed;
+    border-radius: 7px;
+    padding: 0 14px;
+    font-size: 13px;
+    color: #27364d;
+    background: #fff;
+    outline: none;
+    transition: 0.2s;
+}
+
+.auth-input:focus {
+    border-color: #216bff;
+    box-shadow: 0 0 0 3px rgba(33,107,255,0.10);
+}
+
+.password-wrapper {
+    position: relative;
+}
+
+.password-wrapper .auth-input {
+    padding-right: 45px;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    background: transparent;
+    color: #8491a5;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.remember-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 12px 0 20px;
+}
+
+.remember-label {
+    font-size: 12px;
+    color: #56657a;
+}
+
+.forgot-link {
+    color: #1464e8;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.forgot-link:hover {
+    text-decoration: underline;
+}
+
+.auth-submit {
+    width: 100%;
+    height: 44px;
+    border: none;
+    border-radius: 7px;
+    background: linear-gradient(135deg, #1260ed, #0865f4);
+    color: white;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 6px 15px rgba(20,96,237,0.20);
+    transition: 0.2s;
+}
+
+.auth-submit:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px rgba(20,96,237,0.28);
+}
+
+.auth-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 24px 0;
+    color: #9aa5b5;
+    font-size: 11px;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+    content: "";
+    height: 1px;
+    background: #e1e5eb;
+    flex: 1;
+}
+
+.auth-bottom {
+    text-align: center;
+    font-size: 12px;
+    color: #8995a6;
+}
+
+.auth-bottom a {
+    color: #0865ed;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.auth-bottom a:hover {
+    text-decoration: underline;
+}
+
+.auth-error {
+    color: #dc3545;
+    font-size: 11px;
+    margin-top: 5px;
+}
+
+.auth-alert {
+    font-size: 12px;
+    padding: 10px;
+}
+
+@media (max-width: 850px) {
 
     .auth-page {
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 30px;
+        padding: 15px;
     }
 
     .auth-wrapper {
-        width: 100%;
-        max-width: 1100px;
-        min-height: 650px;
-        background: white;
-        border-radius: 14px;
-        overflow: hidden;
-        display: flex;
-        box-shadow: 0 20px 50px rgba(20, 60, 120, 0.18);
+        max-width: 500px;
     }
-
-
-    /* =========================
-       LEFT BLUE PANEL
-       ========================= */
 
     .auth-brand {
-        width: 50%;
-        background: linear-gradient(
-            145deg,
-            #0647b8,
-            #0866ed
-        );
-        color: white;
-        padding: 42px;
-        position: relative;
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
+        display: none;
     }
-
-    .auth-brand::before {
-        content: "";
-        position: absolute;
-        width: 380px;
-        height: 380px;
-        border-radius: 50%;
-        background: rgba(255,255,255,0.05);
-        top: -100px;
-        left: -150px;
-    }
-
-    .auth-brand::after {
-        content: "";
-        position: absolute;
-        width: 420px;
-        height: 420px;
-        border-radius: 50%;
-        background: rgba(255,255,255,0.06);
-        bottom: -230px;
-        left: -80px;
-    }
-
-
-    /* Logo */
-
-    .brand-logo {
-        position: relative;
-        z-index: 2;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
-
-    .brand-logo-icon {
-        width: 42px;
-        height: 42px;
-        border-radius: 10px;
-        background: rgba(255,255,255,0.18);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 24px;
-    }
-
-    .brand-logo h2 {
-        margin: 0;
-        font-size: 21px;
-        font-weight: 700;
-    }
-
-    .brand-logo small {
-        display: block;
-        font-size: 10px;
-        opacity: 0.8;
-        margin-top: 2px;
-    }
-
-
-    /* Illustration */
-
-    .finance-illustration {
-        position: relative;
-        z-index: 2;
-        text-align: center;
-        margin-top: 25px;
-    }
-
-    .chart-box {
-        width: 250px;
-        height: 170px;
-        margin: auto;
-        background: rgba(255,255,255,0.95);
-        border-radius: 15px;
-        position: relative;
-        box-shadow: 0 15px 35px rgba(0,0,0,0.12);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .chart-box i {
-        font-size: 105px;
-        color: #1582ff;
-    }
-
-    .coin {
-        position: absolute;
-        bottom: -15px;
-        left: 35px;
-        width: 48px;
-        height: 48px;
-        border-radius: 50%;
-        background: #f6b91a;
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-        font-size: 20px;
-        box-shadow: 0 5px 10px rgba(0,0,0,0.15);
-    }
-
-    .coin.second {
-        width: 38px;
-        height: 38px;
-        left: 72px;
-        bottom: -5px;
-        background: #f8cf35;
-    }
-
-
-    /* Welcome */
-
-    .brand-description {
-        position: relative;
-        z-index: 2;
-        text-align: center;
-        margin-top: 25px;
-    }
-
-    .brand-description h1 {
-        font-size: 22px;
-        font-weight: 700;
-        margin-bottom: 10px;
-    }
-
-    .brand-description p {
-        font-size: 13px;
-        line-height: 1.7;
-        opacity: 0.88;
-        max-width: 360px;
-        margin: auto;
-    }
-
-
-    /* Features */
-
-    .brand-features {
-        position: relative;
-        z-index: 2;
-        display: flex;
-        justify-content: center;
-        gap: 0;
-        margin-top: 30px;
-    }
-
-    .brand-feature {
-        flex: 1;
-        text-align: center;
-        padding: 0 15px;
-        border-right: 1px solid rgba(255,255,255,0.25);
-    }
-
-    .brand-feature:last-child {
-        border-right: none;
-    }
-
-    .brand-feature i {
-        font-size: 19px;
-        display: block;
-        margin-bottom: 6px;
-    }
-
-    .brand-feature span {
-        font-size: 10px;
-        opacity: 0.85;
-    }
-
-
-    /* =========================
-       RIGHT FORM
-       ========================= */
 
     .auth-form-panel {
-        width: 50%;
-        padding: 60px 70px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: #ffffff;
-    }
-
-    .auth-form-content {
         width: 100%;
-        max-width: 400px;
+        padding: 45px 30px;
+    }
+}
+
+@media (max-width: 480px) {
+
+    .auth-page {
+        padding: 0;
     }
 
-
-    /* Top Icon */
-
-    .auth-top-icon {
-        width: 52px;
-        height: 52px;
-        border-radius: 50%;
-        background: linear-gradient(
-            135deg,
-            #1769ff,
-            #4c54f5
-        );
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 23px;
-        margin: 0 auto 18px;
-        box-shadow: 0 7px 18px rgba(23,105,255,0.25);
+    .auth-wrapper {
+        min-height: 100vh;
+        border-radius: 0;
     }
 
-
-    .auth-heading {
-        text-align: center;
-        margin-bottom: 30px;
+    .auth-form-panel {
+        padding: 35px 22px;
     }
-
-    .auth-heading h1 {
-        font-size: 27px;
-        font-weight: 700;
-        color: #102b52;
-        margin-bottom: 7px;
-    }
-
-    .auth-heading p {
-        font-size: 13px;
-        color: #7c899c;
-        margin: 0;
-    }
-
-
-    /* Labels */
-
-    .auth-form-content .form-label {
-        color: #172b4d;
-        font-size: 13px;
-        margin-bottom: 7px;
-    }
-
-
-    /* Inputs */
-
-    .auth-input {
-        width: 100%;
-        height: 46px;
-        border: 1px solid #dce3ed;
-        border-radius: 7px;
-        padding: 0 14px;
-        font-size: 13px;
-        color: #27364d;
-        background: #fff;
-        outline: none;
-        transition: 0.2s;
-    }
-
-    .auth-input:focus {
-        border-color: #216bff;
-        box-shadow: 0 0 0 3px rgba(33,107,255,0.10);
-    }
-
-
-    /* Password */
-
-    .password-wrapper {
-        position: relative;
-    }
-
-    .password-wrapper .auth-input {
-        padding-right: 45px;
-    }
-
-    .password-toggle {
-        position: absolute;
-        right: 12px;
-        top: 50%;
-        transform: translateY(-50%);
-        border: none;
-        background: transparent;
-        color: #8491a5;
-        cursor: pointer;
-        font-size: 16px;
-    }
-
-
-    /* Remember */
-
-    .remember-row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin: 12px 0 20px;
-    }
-
-    .remember-label {
-        font-size: 12px;
-        color: #56657a;
-    }
-
-    .forgot-link {
-        color: #1464e8;
-        text-decoration: none;
-        font-size: 12px;
-        font-weight: 500;
-    }
-
-    .forgot-link:hover {
-        text-decoration: underline;
-    }
-
-
-    /* Login Button */
-
-    .auth-submit {
-        width: 100%;
-        height: 44px;
-        border: none;
-        border-radius: 7px;
-        background: linear-gradient(
-            135deg,
-            #1260ed,
-            #0865f4
-        );
-        color: white;
-        font-size: 13px;
-        font-weight: 600;
-        cursor: pointer;
-        box-shadow: 0 6px 15px rgba(20,96,237,0.20);
-        transition: 0.2s;
-    }
-
-    .auth-submit:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 8px 20px rgba(20,96,237,0.28);
-    }
-
-
-    /* Divider */
-
-    .auth-divider {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin: 24px 0;
-        color: #9aa5b5;
-        font-size: 11px;
-    }
-
-    .auth-divider::before,
-    .auth-divider::after {
-        content: "";
-        height: 1px;
-        background: #e1e5eb;
-        flex: 1;
-    }
-
-
-    /* Bottom */
-
-    .auth-bottom {
-        text-align: center;
-        font-size: 12px;
-        color: #8995a6;
-    }
-
-    .auth-bottom a {
-        color: #0865ed;
-        font-weight: 600;
-        text-decoration: none;
-    }
-
-    .auth-bottom a:hover {
-        text-decoration: underline;
-    }
-
-
-    /* Errors */
-
-    .auth-error {
-        color: #dc3545;
-        font-size: 11px;
-        margin-top: 5px;
-    }
-
-    .auth-alert {
-        font-size: 12px;
-        padding: 10px;
-    }
-
-
-    /* =========================
-       MOBILE
-       ========================= */
-
-    @media (max-width: 850px) {
-
-        .auth-page {
-            padding: 15px;
-        }
-
-        .auth-wrapper {
-            max-width: 500px;
-        }
-
-        .auth-brand {
-            display: none;
-        }
-
-        .auth-form-panel {
-            width: 100%;
-            padding: 45px 30px;
-        }
-
-    }
-
-
-    @media (max-width: 480px) {
-
-        .auth-page {
-            padding: 0;
-        }
-
-        .auth-wrapper {
-            min-height: 100vh;
-            border-radius: 0;
-        }
-
-        .auth-form-panel {
-            padding: 35px 22px;
-        }
-
-    }
+}
 
 </style>
-
 {% endblock %}
 
 
@@ -501,15 +426,12 @@
 
     <div class="auth-wrapper">
 
-        <!-- =================================
-             LEFT BRANDING
-             ================================= -->
+        <!-- LEFT BRANDING -->
 
         <div class="auth-brand">
 
             <div>
 
-                <!-- Logo -->
                 <div class="brand-logo">
 
                     <div class="brand-logo-icon">
@@ -525,11 +447,10 @@
 
                 </div>
 
-
-                <!-- Illustration -->
                 <div class="finance-illustration">
 
                     <div class="chart-box">
+
                         <i class="bi bi-bar-chart-line-fill"></i>
 
                         <div class="coin">
@@ -539,12 +460,11 @@
                         <div class="coin second">
                             ₹
                         </div>
+
                     </div>
 
                 </div>
 
-
-                <!-- Description -->
                 <div class="brand-description">
 
                     <h1>
@@ -561,8 +481,6 @@
 
             </div>
 
-
-            <!-- Features -->
             <div class="brand-features">
 
                 <div class="brand-feature">
@@ -591,9 +509,7 @@
         </div>
 
 
-        <!-- =================================
-             RIGHT LOGIN
-             ================================= -->
+        <!-- RIGHT LOGIN -->
 
         <div class="auth-form-panel">
 
@@ -602,7 +518,6 @@
                 <div class="auth-top-icon">
                     <i class="bi bi-graph-up-arrow"></i>
                 </div>
-
 
                 <div class="auth-heading">
 
@@ -615,10 +530,15 @@
                 </div>
 
 
-                <form method="post" novalidate>
+                <!-- ============================
+                     LOGIN FORM
+                     ============================ -->
+
+                <form method="post" action="">
 
                     {% csrf_token %}
 
+                    <!-- IMPORTANT: preserve /stocks/ -->
                     {% if next %}
                         <input
                             type="hidden"
@@ -628,7 +548,7 @@
                     {% endif %}
 
 
-                    <!-- Email -->
+                    <!-- EMAIL -->
 
                     <div class="mb-3">
 
@@ -659,7 +579,7 @@
                     </div>
 
 
-                    <!-- Password -->
+                    <!-- PASSWORD -->
 
                     <div class="mb-3">
 
@@ -702,7 +622,18 @@
                     </div>
 
 
-                    <!-- Remember / Forgot -->
+                    <!-- FORM ERRORS -->
+
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger auth-alert">
+                            {% for error in form.non_field_errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+
+                    <!-- REMEMBER / FORGOT -->
 
                     <div class="remember-row">
 
@@ -720,7 +651,7 @@
                         </div>
 
                         <a
-                            href="#"
+                            href="{% url 'accounts:password_reset' %}"
                             class="forgot-link"
                         >
                             Forgot password?
@@ -729,7 +660,7 @@
                     </div>
 
 
-                    <!-- Submit -->
+                    <!-- SUBMIT -->
 
                     <button
                         type="submit"
@@ -742,14 +673,14 @@
                 </form>
 
 
-                <!-- Divider -->
+                <!-- DIVIDER -->
 
                 <div class="auth-divider">
                     OR
                 </div>
 
 
-                <!-- Register -->
+                <!-- REGISTER -->
 
                 <div class="auth-bottom">
 

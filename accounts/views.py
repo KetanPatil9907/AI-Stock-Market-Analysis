@@ -15,9 +15,9 @@ from django.urls import reverse_lazy
 from .forms import LoginForm, ProfileUpdateForm, RegisterForm
 
 
-# ============================================================
+# =========================
 # REGISTER
-# ============================================================
+# =========================
 
 def register_view(request):
     if request.user.is_authenticated:
@@ -29,7 +29,6 @@ def register_view(request):
         if form.is_valid():
             user = form.save()
 
-            # Authenticate the newly registered user
             authenticated_user = authenticate(
                 request,
                 username=user.email,
@@ -48,8 +47,7 @@ def register_view(request):
 
             messages.error(
                 request,
-                "Registration successful, but automatic login failed. "
-                "Please login manually.",
+                "Registration successful, but automatic login failed. Please login manually.",
             )
 
             return redirect("accounts:login")
@@ -64,9 +62,9 @@ def register_view(request):
     )
 
 
-# ============================================================
+# =========================
 # LOGIN
-# ============================================================
+# =========================
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -78,7 +76,7 @@ def login_view(request):
         form = LoginForm(request.POST)
 
         if form.is_valid():
-            email = form.cleaned_data["email"]
+            email = form.cleaned_data["email"].strip()
             password = form.cleaned_data["password"]
 
             user = authenticate(
@@ -91,22 +89,27 @@ def login_view(request):
                 login(request, user)
 
                 # Remember me
-                if not form.cleaned_data["remember_me"]:
+                if form.cleaned_data.get("remember_me"):
+                    request.session.set_expiry(60 * 60 * 24 * 30)
+                else:
                     request.session.set_expiry(0)
 
-                # Safely get the user's profile
+                # Get user's name safely
                 try:
-                    profile = user.profile
-                    welcome_name = profile.full_name
-                except user.profile.RelatedObjectDoesNotExist:
-                    welcome_name = user.first_name or user.username
+                    welcome_name = user.profile.full_name
+                except Exception:
+                    welcome_name = (
+                        user.first_name
+                        or user.username
+                        or user.email
+                    )
 
                 messages.success(
                     request,
                     f"Welcome back, {welcome_name}!",
                 )
 
-                return redirect(next_url or "dashboard:home")
+                return redirect("dashboard:home")
 
             messages.error(
                 request,
@@ -126,9 +129,9 @@ def login_view(request):
     )
 
 
-# ============================================================
+# =========================
 # LOGOUT
-# ============================================================
+# =========================
 
 @login_required
 def logout_view(request):
@@ -143,9 +146,9 @@ def logout_view(request):
     return redirect("accounts:login")
 
 
-# ============================================================
+# =========================
 # PROFILE
-# ============================================================
+# =========================
 
 @login_required
 def profile_view(request):
@@ -188,13 +191,12 @@ def profile_view(request):
     )
 
 
-# ============================================================
+# =========================
 # CHANGE PASSWORD
-# ============================================================
+# =========================
 
 class UserPasswordChangeView(PasswordChangeView):
     template_name = "accounts/password_change.html"
-
     success_url = reverse_lazy(
         "accounts:password_change_done"
     )
@@ -212,9 +214,9 @@ class UserPasswordChangeDoneView(PasswordChangeDoneView):
     template_name = "accounts/password_change_done.html"
 
 
-# ============================================================
-# FORGOT PASSWORD / PASSWORD RESET
-# ============================================================
+# =========================
+# PASSWORD RESET
+# =========================
 
 class UserPasswordResetView(PasswordResetView):
     template_name = "accounts/password_reset_form.html"
@@ -230,8 +232,7 @@ class UserPasswordResetView(PasswordResetView):
     def form_valid(self, form):
         messages.success(
             self.request,
-            "If an account exists with that email, "
-            "a password reset link has been generated.",
+            "If an account exists with that email, a password reset link has been generated.",
         )
 
         return super().form_valid(form)
