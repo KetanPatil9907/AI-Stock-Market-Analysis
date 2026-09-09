@@ -1,0 +1,146 @@
+{% if ipo_items %}
+    <div class="row g-4">
+        {% for item in ipo_items %}
+            <div class="col-md-6 col-xl-4">
+                <div class="card border-0 shadow-sm ipo-card h-100">
+                    <div class="card-body p-4 d-flex flex-column">
+
+                        <div class="d-flex justify-content-between align-items-start gap-2 mb-3">
+                            <span class="badge ipo-status-badge">
+                                {{ item.ipo.get_status_display }}
+                            </span>
+
+                            {% if item.has_sufficient_data %}
+                                <span class="ipo-score-pill">
+                                    {{ item.overall_score }}/100
+                                </span>
+                            {% else %}
+                                <span class="badge text-bg-secondary">
+                                    Limited data
+                                </span>
+                            {% endif %}
+                        </div>
+
+                        <h2 class="h5 fw-bold mb-1">
+                            {{ item.ipo.company_name }}
+                        </h2>
+
+                        <p class="text-muted small mb-3">
+                            {% if item.ipo.industry %}
+                                {{ item.ipo.industry }}
+                            {% else %}
+                                Industry data unavailable
+                            {% endif %}
+                        </p>
+
+                        <div class="ipo-data-grid mb-4">
+                            <div>
+                                <span class="ipo-data-label">
+                                    Price Band
+                                </span>
+
+                                <strong>
+                                    {{ item.ipo.price_band_display }}
+                                </strong>
+                            </div>
+
+                            <div>
+                                <span class="ipo-data-label">
+                                    Issue Size
+                                </span>
+
+                                <strong>
+                                    {% if item.ipo.issue_size_crore is not None %}
+                                        ₹{{ item.ipo.issue_size_crore }} Cr
+                                    {% else %}
+                                        Data unavailable
+                                    {% endif %}
+                                </strong>
+                            </div>
+
+                            <div>
+                                <span class="ipo-data-label">
+                                    Lot Size
+                                </span>
+
+                                <strong>
+                                    {% if item.ipo.lot_size %}
+                                        {{ item.ipo.lot_size }} shares
+                                    {% else %}
+                                        Data unavailable
+                                    {% endif %}
+                                </strong>
+                            </div>
+
+                            <div>
+                                <span class="ipo-data-label">
+                                    Subscription
+                                </span>
+
+                                <strong>
+                                    {% if item.ipo.total_subscription is not None %}
+                                        {{ item.ipo.total_subscription }}x
+                                    {% else %}
+                                        Data unavailable
+                                    {% endif %}
+                                </strong>
+                            </div>
+                        </div>
+
+                        <div class="ipo-date-box mb-3">
+                            <i class="bi bi-calendar-event me-2"></i>
+
+                            {% if item.ipo.status == "OPEN" %}
+                                {% if item.ipo.close_date %}
+                                    Closes {{ item.ipo.close_date|date:"d M Y" }}
+                                {% else %}
+                                    Closing date unavailable
+                                {% endif %}
+                            {% elif item.ipo.status == "UPCOMING" %}
+                                {% if item.ipo.open_date %}
+                                    Opens {{ item.ipo.open_date|date:"d M Y" }}
+                                {% else %}
+                                    Opening date unavailable
+                                {% endif %}
+                            {% elif item.ipo.status == "LISTED" %}
+                                {% if item.ipo.listing_date %}
+                                    Listed {{ item.ipo.listing_date|date:"d M Y" }}
+                                {% else %}
+                                    Listing date unavailable
+                                {% endif %}
+                            {% else %}
+                                IPO date details unavailable
+                            {% endif %}
+                        </div>
+
+                        <div class="mt-auto">
+                            <a
+                                class="btn btn-outline-primary w-100"
+                                href="{% url 'ipo:detail' item.ipo.slug %}"
+                            >
+                                View IPO Details
+                                <i class="bi bi-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="card border-0 shadow-sm">
+        <div class="card-body text-center py-5">
+            <div class="empty-state-icon mb-3">
+                <i class="bi bi-building"></i>
+            </div>
+
+            <h2 class="h5 fw-bold">
+                {{ empty_title }}
+            </h2>
+
+            <p class="text-muted mb-0">
+                {{ empty_message }}
+            </p>
+        </div>
+    </div>
+{% endif %}

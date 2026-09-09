@@ -1,0 +1,518 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {{ ipo.company_name }} IPO | AI Finance Assistant
+{% endblock %}
+
+{% block content %}
+<section class="py-4 py-lg-5">
+    <div class="container">
+
+        <a
+            href="{% url 'ipo:center' %}"
+            class="text-decoration-none small"
+        >
+            <i class="bi bi-arrow-left me-1"></i>
+            Back to IPO Center
+        </a>
+
+        <div class="d-flex flex-column flex-lg-row justify-content-between gap-3 mt-3 mb-4">
+            <div>
+                <span class="badge ipo-status-badge mb-2">
+                    {{ ipo.get_status_display }}
+                </span>
+
+                <h1 class="display-6 fw-bold mb-2">
+                    {{ ipo.company_name }}
+                </h1>
+
+                <div class="d-flex flex-wrap gap-2">
+                    {% if ipo.industry %}
+                        <span class="badge text-bg-light border">
+                            {{ ipo.industry }}
+                        </span>
+                    {% endif %}
+
+                    <span class="badge text-bg-light border">
+                        {{ ipo.exchange }}
+                    </span>
+
+                    {% if ipo.source_name %}
+                        <span class="badge text-bg-light border">
+                            Source: {{ ipo.source_name }}
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="text-lg-end">
+                <p class="small text-muted mb-1">
+                    Educational IPO Score
+                </p>
+
+                <h2 class="display-5 fw-bold mb-1">
+                    {{ analysis.overall_score }}/100
+                </h2>
+
+                <span class="badge classification-badge">
+                    {{ analysis.get_classification_display }}
+                </span>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <div class="col-sm-6 col-lg">
+                <div class="card score-card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <p class="small text-muted mb-1">
+                            Fundamentals
+                        </p>
+
+                        <h3 class="score-value text-primary">
+                            {{ analysis.fundamental_score }}/100
+                        </h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-lg">
+                <div class="card score-card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <p class="small text-muted mb-1">
+                            GMP Context
+                        </p>
+
+                        <h3 class="score-value text-warning">
+                            {{ analysis.gmp_score }}/100
+                        </h3>
+
+                        <p class="score-help-text mb-0">
+                            Unofficial; not a prediction.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-lg">
+                <div class="card score-card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <p class="small text-muted mb-1">
+                            Subscription
+                        </p>
+
+                        <h3 class="score-value text-success">
+                            {{ analysis.subscription_score }}/100
+                        </h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-lg">
+                <div class="card score-card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <p class="small text-muted mb-1">
+                            Valuation
+                        </p>
+
+                        <h3 class="score-value text-info">
+                            {{ analysis.valuation_score }}/100
+                        </h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-lg">
+                <div class="card score-card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <p class="small text-muted mb-1">
+                            Risk Context
+                        </p>
+
+                        <h3 class="score-value text-danger">
+                            {{ analysis.risk_score }}/100
+                        </h3>
+
+                        <p class="score-help-text mb-0">
+                            Higher = lower relative risk in this model.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-8">
+
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white border-0 pt-4 px-4">
+                        <h2 class="h4 fw-bold mb-1">
+                            IPO Details
+                        </h2>
+
+                        <p class="small text-muted mb-0">
+                            Data is shown only when available in the verified
+                            IPO record.
+                        </p>
+                    </div>
+
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <tbody>
+                                    <tr>
+                                        <th scope="row">Price Band</th>
+                                        <td>{{ ipo.price_band_display }}</td>
+
+                                        <th scope="row">Issue Size</th>
+                                        <td>
+                                            {% if ipo.issue_size_crore is not None %}
+                                                ₹{{ ipo.issue_size_crore }} crore
+                                            {% else %}
+                                                <span class="text-muted">Data unavailable</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <th scope="row">Lot Size</th>
+                                        <td>
+                                            {% if ipo.lot_size %}
+                                                {{ ipo.lot_size }} shares
+                                            {% else %}
+                                                <span class="text-muted">Data unavailable</span>
+                                            {% endif %}
+                                        </td>
+
+                                        <th scope="row">Open Date</th>
+                                        <td>
+                                            {% if ipo.open_date %}
+                                                {{ ipo.open_date|date:"d M Y" }}
+                                            {% else %}
+                                                <span class="text-muted">Data unavailable</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <th scope="row">Close Date</th>
+                                        <td>
+                                            {% if ipo.close_date %}
+                                                {{ ipo.close_date|date:"d M Y" }}
+                                            {% else %}
+                                                <span class="text-muted">Data unavailable</span>
+                                            {% endif %}
+                                        </td>
+
+                                        <th scope="row">Listing Date</th>
+                                        <td>
+                                            {% if ipo.listing_date %}
+                                                {{ ipo.listing_date|date:"d M Y" }}
+                                            {% else %}
+                                                <span class="text-muted">Data unavailable</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <th scope="row">
+                                            GMP
+                                            <i
+                                                class="bi bi-info-circle text-warning"
+                                                title="GMP is unofficial and does not guarantee listing gain."
+                                            ></i>
+                                        </th>
+                                        <td>
+                                            {% if ipo.gmp is not None %}
+                                                ₹{{ ipo.gmp }}
+                                                <span class="small text-warning">
+                                                    Unofficial
+                                                </span>
+                                            {% else %}
+                                                <span class="text-muted">Data unavailable</span>
+                                            {% endif %}
+                                        </td>
+
+                                        <th scope="row">Total Subscription</th>
+                                        <td>
+                                            {% if ipo.total_subscription is not None %}
+                                                {{ ipo.total_subscription }}x
+                                            {% else %}
+                                                <span class="text-muted">Data unavailable</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <th scope="row">QIB Subscription</th>
+                                        <td>
+                                            {% if ipo.qib_subscription is not None %}
+                                                {{ ipo.qib_subscription }}x
+                                            {% else %}
+                                                <span class="text-muted">Data unavailable</span>
+                                            {% endif %}
+                                        </td>
+
+                                        <th scope="row">Retail Subscription</th>
+                                        <td>
+                                            {% if ipo.retail_subscription is not None %}
+                                                {{ ipo.retail_subscription }}x
+                                            {% else %}
+                                                <span class="text-muted">Data unavailable</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <th scope="row">Revenue</th>
+                                        <td>
+                                            {% if ipo.revenue_crore is not None %}
+                                                ₹{{ ipo.revenue_crore }} crore
+                                            {% else %}
+                                                <span class="text-muted">Data unavailable</span>
+                                            {% endif %}
+                                        </td>
+
+                                        <th scope="row">Profit</th>
+                                        <td>
+                                            {% if ipo.profit_crore is not None %}
+                                                ₹{{ ipo.profit_crore }} crore
+                                            {% else %}
+                                                <span class="text-muted">Data unavailable</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <th scope="row">Debt</th>
+                                        <td>
+                                            {% if ipo.debt_crore is not None %}
+                                                ₹{{ ipo.debt_crore }} crore
+                                            {% else %}
+                                                <span class="text-muted">Data unavailable</span>
+                                            {% endif %}
+                                        </td>
+
+                                        <th scope="row">Fresh Issue</th>
+                                        <td>
+                                            {% if ipo.fresh_issue_crore is not None %}
+                                                ₹{{ ipo.fresh_issue_crore }} crore
+                                            {% else %}
+                                                <span class="text-muted">Data unavailable</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <th scope="row">Offer for Sale</th>
+                                        <td colspan="3">
+                                            {% if ipo.offer_for_sale_crore is not None %}
+                                                ₹{{ ipo.offer_for_sale_crore }} crore
+                                            {% else %}
+                                                <span class="text-muted">Data unavailable</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                {% if ipo.business_summary %}
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-body p-4">
+                            <h2 class="h4 fw-bold">
+                                Business Summary
+                            </h2>
+
+                            <p class="text-muted mb-0">
+                                {{ ipo.business_summary }}
+                            </p>
+                        </div>
+                    </div>
+                {% endif %}
+
+                {% if ipo.promoter_information %}
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-body p-4">
+                            <h2 class="h4 fw-bold">
+                                Promoter Information
+                            </h2>
+
+                            <p class="text-muted mb-0">
+                                {{ ipo.promoter_information }}
+                            </p>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white border-0 pt-4 px-4">
+                        <h2 class="h4 fw-bold mb-1">
+                            AI Educational Assessment
+                        </h2>
+
+                        <p class="small text-muted mb-0">
+                            The assessment uses only currently stored IPO data.
+                        </p>
+                    </div>
+
+                    <div class="card-body p-4">
+                        <div class="conclusion-box mb-4">
+                            <h3 class="h5 fw-bold">
+                                Assessment
+                            </h3>
+
+                            <p class="mb-0">
+                                {{ analysis.assessment }}
+                            </p>
+                        </div>
+
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="analysis-list-card strengths-card">
+                                    <h3 class="h6 fw-bold">
+                                        <i class="bi bi-check-circle-fill me-2"></i>
+                                        Strengths
+                                    </h3>
+
+                                    <ul class="mb-0">
+                                        {% for item in analysis.strengths %}
+                                            <li>{{ item }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="analysis-list-card weaknesses-card">
+                                    <h3 class="h6 fw-bold">
+                                        <i class="bi bi-exclamation-circle-fill me-2"></i>
+                                        Weaknesses
+                                    </h3>
+
+                                    <ul class="mb-0">
+                                        {% for item in analysis.weaknesses %}
+                                            <li>{{ item }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="analysis-list-card risks-card">
+                                    <h3 class="h6 fw-bold">
+                                        <i class="bi bi-shield-exclamation me-2"></i>
+                                        Risks
+                                    </h3>
+
+                                    <ul class="mb-0">
+                                        {% for item in analysis.risks %}
+                                            <li>{{ item }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <h3 class="h5 fw-bold">
+                                Things to Check Independently
+                            </h3>
+
+                            <ul class="important-factors-list">
+                                {% for item in analysis.things_to_check %}
+                                    <li>{{ item }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm sticky-lg-top stock-action-card">
+                    <div class="card-body p-4">
+                        <h2 class="h5 fw-bold">
+                            IPO Actions
+                        </h2>
+
+                        <p class="small text-muted">
+                            Save this educational IPO analysis for later
+                            review.
+                        </p>
+
+                        {% if analysis.is_saved %}
+                            <button
+                                class="btn btn-success w-100"
+                                type="button"
+                                disabled
+                            >
+                                <i class="bi bi-bookmark-check-fill me-2"></i>
+                                Analysis Saved
+                            </button>
+                        {% else %}
+                            <form
+                                method="post"
+                                action="{% url 'ipo:save' analysis.id %}"
+                            >
+                                {% csrf_token %}
+
+                                <button
+                                    type="submit"
+                                    class="btn btn-finance w-100"
+                                >
+                                    <i class="bi bi-bookmark-plus me-2"></i>
+                                    Save IPO Analysis
+                                </button>
+                            </form>
+                        {% endif %}
+
+                        {% if ipo.official_source_url %}
+                            <a
+                                href="{{ ipo.official_source_url }}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="btn btn-outline-secondary w-100 mt-2"
+                            >
+                                <i class="bi bi-box-arrow-up-right me-2"></i>
+                                View Official Source
+                            </a>
+                        {% endif %}
+
+                        <a
+                            href="{% url 'ipo:center' %}"
+                            class="btn btn-outline-primary w-100 mt-2"
+                        >
+                            <i class="bi bi-buildings me-2"></i>
+                            Back to IPO Center
+                        </a>
+
+                        <hr>
+
+                        <p class="small text-muted mb-0">
+                            GMP is unofficial and may change. It does not
+                            guarantee listing gain or investment returns.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="alert disclaimer-alert mt-4 mb-0">
+            <div class="d-flex align-items-start">
+                <i class="bi bi-info-circle-fill me-3 fs-5"></i>
+
+                <div>
+                    <strong>Financial Disclaimer:</strong>
+                    This page provides educational information only. It is not
+                    financial, investment, tax, or legal advice. This analysis
+                    is not a recommendation to apply for, avoid, buy, or sell
+                    this IPO. Review official documents and obtain qualified
+                    advice where appropriate.
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,8 +1,24 @@
 from django.urls import path
+
 from . import views
 
 app_name = "ipo"
 
 urlpatterns = [
-    path("", views.ipo_home, name="home"),
+    path("", views.ipo_center_view, name="center"),
+    path(
+        "<slug:slug>/",
+        views.ipo_detail_view,
+        name="detail",
+    ),
+    path(
+        "analysis/<int:analysis_id>/save/",
+        views.save_ipo_analysis_view,
+        name="save",
+    ),
+    path(
+        "analysis/<int:analysis_id>/saved/",
+        views.saved_ipo_analysis_view,
+        name="saved",
+    ),
 ]

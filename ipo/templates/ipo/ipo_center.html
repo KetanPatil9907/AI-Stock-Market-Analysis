@@ -1,0 +1,356 @@
+{% extends "base.html" %}
+
+{% block title %}IPO Center | AI Finance Assistant{% endblock %}
+
+{% block content %}
+
+<section class="py-4 py-lg-5">
+    <div class="container">
+
+        <!-- HEADER -->
+        <div class="d-flex flex-column flex-lg-row justify-content-between gap-3 mb-4">
+
+            <div>
+                <span class="badge educational-badge mb-2">
+                    Educational IPO Intelligence
+                </span>
+
+                <h1 class="display-6 fw-bold mb-2">
+                    IPO Center
+                </h1>
+
+                <p class="lead text-muted mb-0">
+                    Explore IPO information available in this platform and
+                    review a transparent educational score.
+                </p>
+            </div>
+
+            <div class="text-lg-end">
+                <span class="badge text-bg-light border">
+                    <i class="bi bi-database me-1"></i>
+                    Data managed through verified entries
+                </span>
+            </div>
+
+        </div>
+
+
+        <!-- HIGHEST RANKED IPO -->
+        {% if highest_ranked_ipo %}
+
+        <div class="card border-0 shadow-sm highest-ipo-card mb-5">
+
+            <div class="card-body p-4 p-lg-5">
+
+                <div class="row align-items-center g-4">
+
+                    <div class="col-lg-8">
+
+                        <span class="badge text-bg-warning mb-2">
+                            Highest Educational Score
+                        </span>
+
+                        <h2 class="h3 fw-bold mb-2">
+                            {{ highest_ranked_ipo.ipo.company_name }}
+                        </h2>
+
+                        <p class="text-muted mb-3">
+                            This ranking is based only on the IPO fields
+                            currently available in the platform. It is not
+                            a “best IPO” recommendation and not a
+                            recommendation to apply.
+                        </p>
+
+                        <div class="d-flex flex-wrap gap-2">
+
+                            <span class="badge text-bg-light border">
+                                {{ highest_ranked_ipo.ipo.get_status_display }}
+                            </span>
+
+                            {% if highest_ranked_ipo.ipo.industry %}
+                            <span class="badge text-bg-light border">
+                                {{ highest_ranked_ipo.ipo.industry }}
+                            </span>
+                            {% endif %}
+
+                            <span class="badge text-bg-light border">
+                                Score:
+                                {{ highest_ranked_ipo.overall_score }}/100
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-lg-4 text-lg-end">
+
+                        <a
+                            class="btn btn-finance"
+                            href="{% url 'ipo:detail' highest_ranked_ipo.ipo.slug %}"
+                        >
+                            View Educational Analysis
+                            <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {% endif %}
+
+
+        <!-- IPO TABS -->
+        <ul
+            class="nav nav-pills mb-4 gap-2"
+            id="ipoTabs"
+            role="tablist"
+        >
+
+            <!-- OPEN -->
+            <li class="nav-item" role="presentation">
+
+                <button
+                    class="nav-link active"
+                    id="open-tab"
+                    data-bs-toggle="pill"
+                    data-bs-target="#open-ipos"
+                    type="button"
+                    role="tab"
+                >
+                    Open IPOs
+
+                    <span class="badge text-bg-light ms-1">
+                        {{ open_ipo_count }}
+                    </span>
+                </button>
+
+            </li>
+
+
+            <!-- UPCOMING -->
+            <li class="nav-item" role="presentation">
+
+                <button
+                    class="nav-link"
+                    id="upcoming-tab"
+                    data-bs-toggle="pill"
+                    data-bs-target="#upcoming-ipos"
+                    type="button"
+                    role="tab"
+                >
+                    Upcoming IPOs
+
+                    <span class="badge text-bg-light ms-1">
+                        {{ upcoming_ipos|length }}
+                    </span>
+                </button>
+
+            </li>
+
+
+            <!-- LISTED -->
+            <li class="nav-item" role="presentation">
+
+                <button
+                    class="nav-link"
+                    id="listed-tab"
+                    data-bs-toggle="pill"
+                    data-bs-target="#listed-ipos"
+                    type="button"
+                    role="tab"
+                >
+                    Recently Listed
+
+                    <span class="badge text-bg-light ms-1">
+                        {{ recently_listed_ipos|length }}
+                    </span>
+                </button>
+
+            </li>
+
+        </ul>
+
+
+        <!-- TAB CONTENT -->
+        <div class="tab-content" id="ipoTabsContent">
+
+
+            <!-- =================================================
+                 OPEN IPOs
+            ================================================== -->
+
+            <div
+                class="tab-pane fade show active"
+                id="open-ipos"
+                role="tabpanel"
+            >
+
+                <!-- SME IPOs -->
+
+                <div class="d-flex align-items-center justify-content-between mb-3">
+
+                    <div>
+                        <h2 class="h4 fw-bold mb-1">
+                            <i class="bi bi-buildings me-2"></i>
+                            SME IPOs
+                        </h2>
+
+                        <p class="text-muted mb-0">
+                            Open IPOs with application size above
+                            ₹15,000.
+                        </p>
+                    </div>
+
+                    <span class="badge text-bg-light border">
+                        {{ sme_ipos|length }} IPOs
+                    </span>
+
+                </div>
+
+
+                {% if sme_ipos %}
+
+                    {% include "ipo/ipo_cards.html" with ipo_items=sme_ipos %}
+
+                {% else %}
+
+                    <div class="card border-0 shadow-sm mb-5">
+
+                        <div class="card-body text-center py-5">
+
+                            <i class="bi bi-inbox fs-1 text-muted"></i>
+
+                            <h5 class="mt-3">
+                                No open SME IPOs
+                            </h5>
+
+                            <p class="text-muted mb-0">
+                                No SME IPO currently matches the
+                                ₹15,000 size classification.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                {% endif %}
+
+
+                <!-- MAINBOARD IPOs -->
+
+                <div class="d-flex align-items-center justify-content-between mb-3 mt-5">
+
+                    <div>
+                        <h2 class="h4 fw-bold mb-1">
+                            <i class="bi bi-building me-2"></i>
+                            Mainboard IPOs
+                        </h2>
+
+                        <p class="text-muted mb-0">
+                            Open IPOs with application size of
+                            ₹15,000 or below.
+                        </p>
+                    </div>
+
+                    <span class="badge text-bg-light border">
+                        {{ mainboard_ipos|length }} IPOs
+                    </span>
+
+                </div>
+
+
+                {% if mainboard_ipos %}
+
+                    {% include "ipo/ipo_cards.html" with ipo_items=mainboard_ipos %}
+
+                {% else %}
+
+                    <div class="card border-0 shadow-sm mb-5">
+
+                        <div class="card-body text-center py-5">
+
+                            <i class="bi bi-inbox fs-1 text-muted"></i>
+
+                            <h5 class="mt-3">
+                                No open Mainboard IPOs
+                            </h5>
+
+                            <p class="text-muted mb-0">
+                                No Mainboard IPO currently matches the
+                                ₹15,000 size classification.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- =================================================
+                 UPCOMING IPOs
+            ================================================== -->
+
+            <div
+                class="tab-pane fade"
+                id="upcoming-ipos"
+                role="tabpanel"
+            >
+
+                {% include "ipo/ipo_cards.html" with ipo_items=upcoming_ipos empty_title="No upcoming IPOs currently available" empty_message="Upcoming IPO records will appear here after verified details are added." %}
+
+            </div>
+
+
+            <!-- =================================================
+                 RECENTLY LISTED
+            ================================================== -->
+
+            <div
+                class="tab-pane fade"
+                id="listed-ipos"
+                role="tabpanel"
+            >
+
+                {% include "ipo/ipo_cards.html" with ipo_items=recently_listed_ipos empty_title="No recently listed IPOs currently available" empty_message="Recently listed IPO records will appear here after they are added." %}
+
+            </div>
+
+        </div>
+
+
+        <!-- DISCLAIMER -->
+
+        <div class="alert disclaimer-alert mt-5 mb-0">
+
+            <div class="d-flex align-items-start">
+
+                <i class="bi bi-info-circle-fill me-3 fs-5"></i>
+
+                <div>
+
+                    <strong>Financial Disclaimer:</strong>
+
+                    This IPO Center is for educational purposes only.
+                    Scores are not investment recommendations. IPO prices
+                    may be volatile after listing. GMP is unofficial, may
+                    change quickly, and does not guarantee listing gains.
+                    Review official documents and conduct independent
+                    research.
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+{% endblock %}
