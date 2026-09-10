@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block title %}Investment Goals | Money Planner{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{% url 'investments:home' %}">Money Planner</a>
+            </li>
+            <li class="breadcrumb-item active">Goals</li>
+        </ol>
+    </nav>
+
+    <div class="row g-4">
+
+        <!-- LEFT: Goals List -->
+        <div class="col-lg-7">
+            <div class="mp-section">
+                <h3 class="fw-bold mb-3">
+                    <i class="bi bi-bullseye me-2"></i>Your Goals
+                </h3>
+
+                {% if goals %}
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Goal</th>
+                                <th>Target</th>
+                                <th>Years</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for goal in goals %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>
+                                    {% if goal.custom_name %}
+                                        {{ goal.custom_name }}
+                                    {% else %}
+                                        {{ goal.get_goal_type_display }}
+                                    {% endif %}
+                                </td>
+                                <td>₹{{ goal.target_amount|floatformat:0 }}</td>
+                                <td>{{ goal.target_years }}y</td>
+                                <td class="text-end">
+                                    <a href="{% url 'investments:goal_edit' goal.id %}" class="btn btn-sm btn-outline-primary me-1">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <form method="post" action="{% url 'investments:goal_delete' goal.id %}" class="d-inline" onsubmit="return confirm('Delete this goal?')">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="text-center mt-3">
+                    <a href="{% url 'investments:generate_plan' %}" class="btn btn-finance btn-lg">
+                        <i class="bi bi-magic me-2"></i>Generate Plan
+                    </a>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-bullseye mp-empty-icon"></i>
+                    <p class="text-muted mt-2">
+                        No goals yet. Add your first goal below.
+                    </p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- RIGHT: Add Goal Form -->
+        <div class="col-lg-5">
+            <div class="mp-section">
+                <h4 class="fw-bold mb-3">
+                    <i class="bi bi-plus-circle me-2"></i>Add Goal
+                </h4>
+
+                <form method="post" novalidate>
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label for="{{ form.goal_type.id_for_label }}" class="form-label fw-semibold">
+                            Goal Type
+                        </label>
+                        {{ form.goal_type }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.custom_name.id_for_label }}" class="form-label fw-semibold">
+                            Custom Name (optional)
+                        </label>
+                        {{ form.custom_name }}
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-6">
+                            <label for="{{ form.target_amount.id_for_label }}" class="form-label fw-semibold">
+                                Target Amount (₹)
+                            </label>
+                            {{ form.target_amount }}
+                            {% if form.target_amount.errors %}
+                                <div class="text-danger small">{{ form.target_amount.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-6">
+                            <label for="{{ form.target_years.id_for_label }}" class="form-label fw-semibold">
+                                Years
+                            </label>
+                            {{ form.target_years }}
+                            {% if form.target_years.errors %}
+                                <div class="text-danger small">{{ form.target_years.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.priority.id_for_label }}" class="form-label fw-semibold">
+                            Priority (1 = highest)
+                        </label>
+                        {{ form.priority }}
+                    </div>
+
+                    <button type="submit" class="btn btn-finance w-100">
+                        <i class="bi bi-plus-lg me-2"></i>Add Goal
+                    </button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

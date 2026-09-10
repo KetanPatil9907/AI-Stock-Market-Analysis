@@ -1,0 +1,323 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Top Stock Picks for 3-6 Months | AI Finance Assistant{% endblock %}
+
+{% block extra_css %}
+<style>
+    .rec-hero {
+        background: linear-gradient(135deg, #0a1628 0%, #1a3a5c 50%, #0d6efd 100%);
+        color: #fff;
+        padding: 48px 0 36px;
+    }
+    .rec-hero h1 { font-weight: 800; font-size: 2rem; margin-bottom: 8px; }
+    .rec-hero p { opacity: 0.85; font-size: 1rem; }
+
+    .summary-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+        gap: 16px;
+        margin-top: -32px;
+        padding: 0 16px;
+        position: relative;
+        z-index: 2;
+    }
+    .summary-card {
+        background: #fff;
+        border-radius: 14px;
+        padding: 20px;
+        text-align: center;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        border: 1px solid rgba(0,0,0,0.04);
+    }
+    .summary-card .sc-value {
+        font-size: 1.6rem;
+        font-weight: 700;
+    }
+    .summary-card .sc-label {
+        font-size: 0.78rem;
+        color: #6c757d;
+        margin-top: 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .sc-green { color: #10b981; }
+    .sc-blue { color: #0d6efd; }
+    .sc-amber { color: #f59e0b; }
+
+    .filter-bar {
+        background: #fff;
+        border-radius: 14px;
+        padding: 16px 24px;
+        margin: 24px 0;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+    }
+    .filter-bar label { font-size: 0.85rem; font-weight: 600; margin-bottom: 0; }
+    .filter-bar select, .filter-bar input {
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+        padding: 6px 12px;
+        font-size: 0.88rem;
+    }
+    .filter-bar .btn-filter {
+        background: #0d6efd;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 8px 24px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+    .filter-bar .btn-filter:hover { background: #0b5ed7; }
+
+    .section-title {
+        font-size: 1.15rem;
+        font-weight: 700;
+        margin: 28px 0 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .section-title .badge-count {
+        background: #e9ecef;
+        color: #495057;
+        border-radius: 20px;
+        padding: 2px 12px;
+        font-size: 0.78rem;
+        font-weight: 600;
+    }
+
+    .stock-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+        gap: 18px;
+        margin-bottom: 40px;
+    }
+
+    .stock-card {
+        background: #fff;
+        border-radius: 14px;
+        overflow: hidden;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        border: 1px solid rgba(0,0,0,0.04);
+        transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .stock-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 24px rgba(0,0,0,0.12);
+    }
+    .card-top {
+        padding: 18px 20px 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+    .card-symbol { font-size: 1.15rem; font-weight: 700; }
+    .card-name { font-size: 0.8rem; color: #6c757d; margin-top: 2px; }
+    .card-sector {
+        font-size: 0.7rem;
+        background: #f0f4ff;
+        color: #4a6fa5;
+        border-radius: 6px;
+        padding: 2px 8px;
+        margin-top: 4px;
+        display: inline-block;
+    }
+    .signal-badge {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .signal-STRONG_BUY { background: #d1fae5; color: #065f46; }
+    .signal-BUY { background: #dbeafe; color: #1e40af; }
+    .signal-HOLD { background: #fef3c7; color: #92400e; }
+    .signal-SELL { background: #fee2e2; color: #991b1b; }
+    .signal-STRONG_SELL { background: #fecaca; color: #7f1d1d; }
+
+    .card-scores {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1px;
+        background: #f0f0f0;
+        margin: 0 20px;
+    }
+    .card-scores > div {
+        background: #fff;
+        padding: 10px 12px;
+        text-align: center;
+    }
+    .cs-val { font-size: 1.1rem; font-weight: 700; }
+    .cs-lbl { font-size: 0.68rem; color: #6c757d; text-transform: uppercase; }
+
+    .card-targets {
+        padding: 14px 20px;
+        display: flex;
+        gap: 16px;
+    }
+    .target-box {
+        flex: 1;
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 12px;
+        text-align: center;
+    }
+    .target-box .t-period { font-size: 0.72rem; color: #6c757d; text-transform: uppercase; }
+    .target-box .t-price { font-size: 1rem; font-weight: 700; margin-top: 2px; }
+    .target-box .t-return { font-size: 0.82rem; font-weight: 600; margin-top: 2px; }
+    .t-return.positive { color: #10b981; }
+    .t-return.negative { color: #ef4444; }
+
+    .card-reasons {
+        padding: 0 20px 14px;
+    }
+    .card-reasons ul {
+        margin: 0;
+        padding-left: 16px;
+        font-size: 0.78rem;
+        color: #495057;
+    }
+    .card-reasons li { margin-bottom: 3px; }
+
+    .card-footer {
+        border-top: 1px solid #f0f0f0;
+        padding: 10px 20px;
+        text-align: center;
+    }
+    .card-footer a {
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: #0d6efd;
+        text-decoration: none;
+    }
+    .card-footer a:hover { text-decoration: underline; }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #6c757d;
+    }
+    .empty-state i { font-size: 3rem; margin-bottom: 16px; display: block; }
+
+    .disclaimer-box {
+        background: #fff3cd;
+        border: 1px solid #ffc107;
+        border-radius: 10px;
+        padding: 16px 20px;
+        margin: 30px 0;
+        font-size: 0.82rem;
+        color: #664d03;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="rec-hero">
+    <div class="container">
+        <h1><i class="bi bi-graph-up-arrow me-2"></i>Top Stock Picks for 3–6 Months</h1>
+        <p>AI-powered multi-factor analysis identifies stocks likely to appreciate over the next 3 to 6 months.</p>
+    </div>
+</section>
+
+<div class="container">
+    <div class="summary-cards">
+        <div class="summary-card">
+            <div class="sc-value sc-blue">{{ total_count }}</div>
+            <div class="sc-label">Stocks Analyzed</div>
+        </div>
+        <div class="summary-card">
+            <div class="sc-value sc-green">{{ strong_buys|length }}</div>
+            <div class="sc-label">Strong Buy</div>
+        </div>
+        <div class="summary-card">
+            <div class="sc-value sc-blue">{{ buys|length }}</div>
+            <div class="sc-label">Buy</div>
+        </div>
+        <div class="summary-card">
+            <div class="sc-value sc-green">+{{ avg_return_3m }}%</div>
+            <div class="sc-label">Avg 3M Return</div>
+        </div>
+        <div class="summary-card">
+            <div class="sc-value sc-green">+{{ avg_return_6m }}%</div>
+            <div class="sc-label">Avg 6M Return</div>
+        </div>
+    </div>
+
+    <form method="get" class="filter-bar">
+        <label>Sector:</label>
+        <select name="sector">
+            <option value="">All Sectors</option>
+            {% for s in sector_choices %}
+            <option value="{{ s }}" {% if selected_sector == s %}selected{% endif %}>{{ s }}</option>
+            {% endfor %}
+        </select>
+        <label>Min Return %:</label>
+        <select name="min_return">
+            <option value="0" {% if selected_min_return == 0 %}selected{% endif %}>Any</option>
+            <option value="5" {% if selected_min_return == 5 %}selected{% endif %}>5%+</option>
+            <option value="10" {% if selected_min_return == 10 %}selected{% endif %}>10%+</option>
+            <option value="15" {% if selected_min_return == 15 %}selected{% endif %}>15%+</option>
+            <option value="20" {% if selected_min_return == 20 %}selected{% endif %}>20%+</option>
+        </select>
+        <button type="submit" class="btn-filter">Filter</button>
+    </form>
+
+    {% if strong_buys %}
+    <div class="section-title">
+        <i class="bi bi-fire" style="color:#ef4444"></i> Strong Buy
+        <span class="badge-count">{{ strong_buys|length }}</span>
+    </div>
+    <div class="stock-grid">
+        {% for stock in strong_buys %}
+        {% include "predictions/_recommendation_card.html" with stock=stock %}
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if buys %}
+    <div class="section-title">
+        <i class="bi bi-arrow-up-circle" style="color:#0d6efd"></i> Buy
+        <span class="badge-count">{{ buys|length }}</span>
+    </div>
+    <div class="stock-grid">
+        {% for stock in buys %}
+        {% include "predictions/_recommendation_card.html" with stock=stock %}
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if holds %}
+    <div class="section-title">
+        <i class="bi bi-pause-circle" style="color:#f59e0b"></i> Hold / Watch
+        <span class="badge-count">{{ holds|length }}</span>
+    </div>
+    <div class="stock-grid">
+        {% for stock in holds %}
+        {% include "predictions/_recommendation_card.html" with stock=stock %}
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if not recommendations %}
+    <div class="empty-state">
+        <i class="bi bi-search"></i>
+        <h5>No stocks match your filters</h5>
+        <p>Try broadening your criteria or selecting a different sector.</p>
+    </div>
+    {% endif %}
+
+    <div class="disclaimer-box">
+        <i class="bi bi-exclamation-triangle-fill me-1"></i>
+        <strong>Educational Purpose Only:</strong> These predictions are generated by an AI system using
+        technical analysis, fundamental data, and statistical models. They are NOT financial advice.
+        Past performance does not guarantee future results. Always do your own research and consult
+        a qualified financial advisor before making investment decisions.
+    </div>
+</div>
+{% endblock %}

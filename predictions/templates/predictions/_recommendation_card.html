@@ -1,0 +1,68 @@
+<div class="stock-card">
+    <div class="card-top">
+        <div>
+            <a href="{% url 'predictions:stock_forecast' stock.symbol %}" class="card-symbol text-decoration-none text-dark">
+                {{ stock.symbol }}
+            </a>
+            <div class="card-name">{{ stock.name }}</div>
+            <span class="card-sector">{{ stock.sector }}</span>
+        </div>
+        <span class="signal-badge signal-{{ stock.signal }}">{{ stock.signal|replace:"_"," " }}</span>
+    </div>
+
+    <div class="card-scores">
+        <div>
+            <div class="cs-val">{{ stock.composite_score }}</div>
+            <div class="cs-lbl">Composite</div>
+        </div>
+        <div>
+            <div class="cs-val">₹{{ stock.current_price|floatformat:0 }}</div>
+            <div class="cs-lbl">Current Price</div>
+        </div>
+        <div>
+            <div class="cs-val">{{ stock.momentum_score|floatformat:0 }}</div>
+            <div class="cs-lbl">Momentum</div>
+        </div>
+        <div>
+            <div class="cs-val">{{ stock.rsi|floatformat:0 }}</div>
+            <div class="cs-lbl">RSI</div>
+        </div>
+    </div>
+
+    <div class="card-targets">
+        {% if stock.target_3m %}
+        <div class="target-box">
+            <div class="t-period">3 Month Target</div>
+            <div class="t-price">₹{{ stock.target_3m|floatformat:0 }}</div>
+            <div class="t-return {% if stock.return_3m_pct > 0 %}positive{% elif stock.return_3m_pct < 0 %}negative{% endif %}">
+                {% if stock.return_3m_pct > 0 %}+{% endif %}{{ stock.return_3m_pct|floatformat:1 }}%
+            </div>
+        </div>
+        {% endif %}
+        {% if stock.target_6m %}
+        <div class="target-box">
+            <div class="t-period">6 Month Target</div>
+            <div class="t-price">₹{{ stock.target_6m|floatformat:0 }}</div>
+            <div class="t-return {% if stock.return_6m_pct > 0 %}positive{% elif stock.return_6m_pct < 0 %}negative{% endif %}">
+                {% if stock.return_6m_pct > 0 %}+{% endif %}{{ stock.return_6m_pct|floatformat:1 }}%
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if stock.reasons %}
+    <div class="card-reasons">
+        <ul>
+            {% for reason in stock.reasons|slice:":3" %}
+            <li>{{ reason }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <div class="card-footer">
+        <a href="{% url 'predictions:stock_forecast' stock.symbol %}">
+            Full Forecast <i class="bi bi-arrow-right"></i>
+        </a>
+    </div>
+</div>

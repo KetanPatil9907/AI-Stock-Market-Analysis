@@ -131,3 +131,234 @@ class MarketDataService:
             "prices": [round(float(p), 2) for p in hist["Close"].tolist()],
             "volumes": [int(v) for v in hist["Volume"].tolist()],
         }
+
+    def get_dividend_history(self, symbol: str) -> dict:
+        """
+        Fetch dividend payment history for a stock.
+        Returns the last 10 dividend payments.
+        """
+        clean = _clean_symbol(symbol)
+        try:
+            t = self._ticker(clean)
+            dividends = t.dividends
+        except Exception as e:
+            logger.error("get_dividend_history failed for %s: %s", clean, e)
+            return {"dividends": [], "total_dividends": 0, "avg_dividend": 0}
+
+        if dividends is None or dividends.empty:
+            return {"dividends": [], "total_dividends": 0, "avg_dividend": 0}
+
+        records = []
+        for date, amount in dividends.tail(10).items():
+            records.append({
+                "date": date.strftime("%d %b %Y"),
+                "amount": round(float(amount), 2),
+            })
+
+        amounts = [float(a) for _, a in dividends.items()]
+        total = round(sum(amounts), 2)
+        avg = round(total / len(amounts), 2) if amounts else 0
+
+        return {
+            "dividends": list(reversed(records)),
+            "total_dividends": len(records),
+            "avg_dividend": avg,
+        }
+
+    def get_insider_transactions(self, symbol: str) -> dict:
+        """
+        Fetch insider buying/selling activity.
+        Returns the last 10 insider transactions.
+        """
+        clean = _clean_symbol(symbol)
+        try:
+            t = self._ticker(clean)
+            insider = t.insider_transactions
+        except Exception as e:
+            logger.error("get_insider_transactions failed for %s: %s", clean, e)
+            return {"transactions": [], "summary": {}}
+
+        if insider is None or insider.empty:
+            return {"transactions": [], "summary": {}}
+
+        records = []
+        for _, row in insider.tail(10).iterrows():
+            text = str(row.get("Text", ""))
+            shares = row.get("Shares", None)
+            value = row.get("Value", None)
+            pos = row.get("Position", "")
+            start_date = str(row.get("Start Date", ""))
+
+            action = "UNKNOWN"
+            text_lower = text.lower()
+            if "purchase" in text_lower or "buy" in text_lower:
+                action = "PURCHASE"
+            elif "sale" in text_lower or "sell" in text_lower:
+                action = "SALE"
+            elif "grant" in text_lower or "option" in text_lower:
+                action = "GRANT"
+            elif "exercise" in text_lower:
+                action = "EXERCISE"
+
+            records.append({
+                "date": start_date[:10] if start_date else "N/A",
+                "insider": str(row.get("Insider", "Unknown")),
+                "position": str(pos) if pos else "Unknown",
+                "action": action,
+                "shares": int(shares) if shares and str(shares).replace(".", "").replace("-", "").isdigit() else None,
+                "value": round(float(value), 2) if value and str(value).replace(".", "").replace("-", "").isdigit() else None,
+                "text": text[:100] if text else "",
+            })
+
+        purchases = sum(1 for r in records if r["action"] == "PURCHASE")
+        sales = sum(1 for r in records if r["action"] == "SALE")
+
+        if purchases > sales:
+            sentiment = "NET_BUYING"
+            sentiment_note = "More insider purchases than sales recently."
+        elif sales > purchases:
+            sentiment = "NET_SELLING"
+            sentiment_note = "More insider sales than purchases recently."
+        else:
+            sentiment = "BALANCED"
+            sentiment_note = "Insider transactions are balanced between buys and sells."
+
+        return {
+            "transactions": records,
+            "summary": {
+                "total_transactions": len(records),
+                "purchases": purchases,
+                "sales": sales,
+                "sentiment": sentiment,
+                "sentiment_note": sentiment_note,
+            },
+        }
+
+    def get_peer_stocks(self, sector: str, industry: str, exclude_symbol: str = "") -> list:
+        """
+        Find peer stocks in the same sector/industry.
+        Returns a list of well-known NSE stocks in the same sector.
+        Falls back to sector-level peers if industry match not found.
+        """
+        SECTOR_PEERS = {
+            "Technology": [
+                {"symbol": "TCS", "name": "Tata Consultancy Services"},
+                {"symbol": "INFY", "name": "Infosys"},
+                {"symbol": "HCLTECH", "name": "HCL Technologies"},
+                {"symbol": "WIPRO", "name": "Wipro"},
+                {"symbol": "TECHM", "name": "Tech Mahindra"},
+                {"symbol": "LTIM", "name": "LTIMindtree"},
+                {"symbol": "PERSISTENT", "name": "Persistent Systems"},
+                {"symbol": "COFORGE", "name": "Coforge"},
+            ],
+            "Financial Services": [
+                {"symbol": "HDFCBANK", "name": "HDFC Bank"},
+                {"symbol": "ICICIBANK", "name": "ICICI Bank"},
+                {"symbol": "SBIN", "name": "State Bank of India"},
+                {"symbol": "KOTAKBANK", "name": "Kotak Mahindra Bank"},
+                {"symbol": "AXISBANK", "name": "Axis Bank"},
+                {"symbol": "BHARTIFIN", "name": "Bharti Airtel"},
+                {"symbol": "BAJFINANCE", "name": "Bajaj Finance"},
+                {"symbol": "HDFCLIFE", "name": "HDFC Life Insurance"},
+            ],
+            "Energy": [
+                {"symbol": "RELIANCE", "name": "Reliance Industries"},
+                {"symbol": "ONGC", "name": "Oil and Natural Gas Corp"},
+                {"symbol": "BPCL", "name": "Bharat Petroleum"},
+                {"symbol": "IOC", "name": "Indian Oil Corporation"},
+                {"symbol": "NTPC", "name": "NTPC"},
+                {"symbol": "POWERGRID", "name": "Power Grid Corp"},
+                {"symbol": "ADANIENT", "name": "Adani Enterprises"},
+                {"symbol": "TATAPOWER", "name": "Tata Power"},
+            ],
+            "Consumer Cyclical": [
+                {"symbol": "TATAMOTORS", "name": "Tata Motors"},
+                {"symbol": "M&M", "name": "Mahindra & Mahindra"},
+                {"symbol": "MARUTI", "name": "Maruti Suzuki"},
+                {"symbol": "BAJAJ-AUTO", "name": "Bajaj Auto"},
+                {"symbol": "HEROMOTOCO", "name": "Hero MotoCorp"},
+                {"symbol": "TVSMOTOR", "name": "TVS Motor"},
+                {"symbol": "EICHERMOT", "name": "Eicher Motors"},
+                {"symbol": "ASHOKLEY", "name": "Ashok Leyland"},
+            ],
+            "Consumer Defensive": [
+                {"symbol": "HINDUNILVR", "name": "Hindustan Unilever"},
+                {"symbol": "ITC", "name": "ITC"},
+                {"symbol": "NESTLEIND", "name": "Nestle India"},
+                {"symbol": "BRITANNIA", "name": "Britannia Industries"},
+                {"symbol": "DABUR", "name": "Dabur India"},
+                {"symbol": "MARICO", "name": "Marico"},
+                {"symbol": "COLPAL", "name": "Colgate-Palmolive"},
+                {"symbol": "EMAMILTD", "name": "Emami"},
+            ],
+            "Industrials": [
+                {"symbol": "LT", "name": "Larsen & Toubro"},
+                {"symbol": "TATASTEEL", "name": "Tata Steel"},
+                {"symbol": "TORNTPHARM", "name": "Torrent Pharma"},
+                {"symbol": "ADANIPORTS", "name": "Adani Ports"},
+                {"symbol": "GODREJCP", "name": "Godrej Consumer"},
+                {"symbol": "BEL", "name": "Bharat Electronics"},
+                {"symbol": "HAL", "name": "Hindustan Aeronautics"},
+                {"symbol": "SIEMENS", "name": "Siemens India"},
+            ],
+            "Healthcare": [
+                {"symbol": "SUNPHARMA", "name": "Sun Pharma"},
+                {"symbol": "DRREDDY", "name": "Dr. Reddy's Laboratories"},
+                {"symbol": "CIPLA", "name": "Cipla"},
+                {"symbol": "DIVISLAB", "name": "Divi's Laboratories"},
+                {"symbol": "TRENT", "name": "Trent"},
+                {"symbol": "APOLLOHOSP", "name": "Apollo Hospitals"},
+                {"symbol": "LALPATHLAB", "name": "Dr. Lal PathLabs"},
+                {"symbol": "MAXHEALTH", "name": "Max Healthcare"},
+            ],
+            "Basic Materials": [
+                {"symbol": "TATASTEEL", "name": "Tata Steel"},
+                {"symbol": "JSWSTEEL", "name": "JSW Steel"},
+                {"symbol": "HINDALCO", "name": "Hindalco Industries"},
+                {"symbol": "VEDL", "name": "Vedanta"},
+                {"symbol": "ULTRACEMCO", "name": "UltraTech Cement"},
+                {"symbol": "ACC", "name": "ACC"},
+                {"symbol": "AMBUJACEM", "name": "Ambuja Cements"},
+                {"symbol": "GRASIM", "name": "Grasim Industries"},
+            ],
+            "Communication Services": [
+                {"symbol": "BHARTIARTL", "name": "Bharti Airtel"},
+                {"symbol": "IDEA", "name": "Vodafone Idea"},
+                {"symbol": "INDUSTOWER", "name": "Indus Towers"},
+            ],
+            "Real Estate": [
+                {"symbol": "DLF", "name": "DLF"},
+                {"symbol": "GODREJPROP", "name": "Godrej Properties"},
+                {"symbol": "OBEROIRLTY", "name": "Oberoi Realty"},
+                {"symbol": "PRESTIGE", "name": "Prestige Estates"},
+                {"symbol": "BRIGADE", "name": "Brigade Enterprises"},
+            ],
+            "Utilities": [
+                {"symbol": "NTPC", "name": "NTPC"},
+                {"symbol": "POWERGRID", "name": "Power Grid Corp"},
+                {"symbol": "TATAPOWER", "name": "Tata Power"},
+                {"symbol": "ADANIPOWER", "name": "Adani Power"},
+                {"symbol": "NHPC", "name": "NHPC"},
+                {"symbol": "SJVN", "name": "SJVN"},
+            ],
+        }
+
+        clean_exclude = _clean_symbol(exclude_symbol) if exclude_symbol else ""
+
+        sector_key = None
+        for key in SECTOR_PEERS:
+            if sector and key.lower() in sector.lower():
+                sector_key = key
+                break
+
+        if not sector_key:
+            sector_key = "Technology"
+
+        peers = SECTOR_PEERS.get(sector_key, [])
+
+        filtered = [
+            p for p in peers
+            if p["symbol"] != clean_exclude
+        ]
+
+        return filtered[:6]

@@ -1,0 +1,362 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Your Money Plan | Money Planner{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{% url 'investments:home' %}">Money Planner</a>
+            </li>
+            <li class="breadcrumb-item active">Your Plan</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">
+                <i class="bi bi-graph-up me-2"></i>Your Money Plan
+            </h2>
+            <p class="text-muted mb-0">
+                {{ plan.investor_profile.get_risk_tolerance_display }} Risk |
+                Generated {{ plan.created_at|date:"d M Y, h:i A" }}
+            </p>
+        </div>
+        <div class="d-flex gap-2">
+            {% if not plan.is_saved %}
+            <form method="post" action="{% url 'investments:save_plan' plan.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success">
+                    <i class="bi bi-bookmark-plus me-1"></i>Save Plan
+                </button>
+            </form>
+            {% endif %}
+            <a href="{% url 'investments:home' %}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i>Back
+            </a>
+        </div>
+    </div>
+
+    <!-- ==================== DISCLAIMER ==================== -->
+    <div class="alert alert-warning disclaimer-alert mb-4">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        <strong>Educational Only:</strong> These projections are based on
+        assumed returns and are NOT guaranteed. Past performance does not
+        guarantee future results.
+    </div>
+
+    <!-- ==================== ALLOCATION OVERVIEW ==================== -->
+    <div class="row g-4 mb-4">
+
+        <!-- Pie Chart -->
+        <div class="col-lg-5">
+            <div class="mp-section">
+                <h4 class="fw-bold mb-3">Asset Allocation</h4>
+                <div class="text-center mb-3">
+                    <canvas id="allocationChart" width="300" height="300"></canvas>
+                </div>
+                <div class="d-flex flex-wrap gap-2 justify-content-center">
+                    <span class="badge" style="background-color:#155eef">
+                        Equity {{ plan.equity_pct }}%
+                    </span>
+                    <span class="badge" style="background-color:#0e9f6e">
+                        Debt {{ plan.debt_pct }}%
+                    </span>
+                    <span class="badge" style="background-color:#f59e0b">
+                        Gold {{ plan.gold_pct }}%
+                    </span>
+                    <span class="badge" style="background-color:#94a3b8">
+                        Cash {{ plan.cash_pct }}%
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary Stats -->
+        <div class="col-lg-7">
+            <div class="mp-section">
+                <h4 class="fw-bold mb-3">Plan Summary</h4>
+                <div class="row g-3">
+                    <div class="col-6 col-md-3">
+                        <div class="mp-stat-card">
+                            <div class="mp-stat-label">Monthly SIP</div>
+                            <div class="mp-stat-value text-primary">
+                                ₹{{ plan.total_monthly_sip|floatformat:0 }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="mp-stat-card">
+                            <div class="mp-stat-label">Expected Return</div>
+                            <div class="mp-stat-value">
+                                {{ plan.sip_returns_pct }}%
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="mp-stat-card">
+                            <div class="mp-stat-label">5 Year Corpus</div>
+                            <div class="mp-stat-value text-success">
+                                ₹{{ plan.projected_corpus_5y|floatformat:0 }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="mp-stat-card">
+                            <div class="mp-stat-label">10 Year Corpus</div>
+                            <div class="mp-stat-value text-success">
+                                ₹{{ plan.projected_corpus_10y|floatformat:0 }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="mp-stat-card">
+                            <div class="mp-stat-label">15 Year Corpus</div>
+                            <div class="mp-stat-value text-success">
+                                ₹{{ plan.projected_corpus_15y|floatformat:0 }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="mp-stat-card">
+                            <div class="mp-stat-label">20 Year Corpus</div>
+                            <div class="mp-stat-value text-success">
+                                ₹{{ plan.projected_corpus_20y|floatformat:0 }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ==================== CORPUS GROWTH CHART ==================== -->
+    <div class="mp-section mb-4">
+        <h4 class="fw-bold mb-3">
+            <i class="bi bi-graph-up-arrow me-2"></i>Corpus Growth Over Time
+        </h4>
+        <canvas id="corpusChart" height="100"></canvas>
+    </div>
+
+    <!-- ==================== SIP BREAKDOWN ==================== -->
+    <div class="mp-section mb-4">
+        <h4 class="fw-bold mb-3">
+            <i class="bi bi-list-check me-2"></i>SIP Breakdown
+        </h4>
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Category</th>
+                        <th>Allocation</th>
+                        <th>Monthly SIP</th>
+                        <th>Assumed Return</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in sip_entries %}
+                    <tr>
+                        <td>
+                            <span class="fw-semibold">{{ entry.category }}</span>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="mp-bar" style="width: {{ entry.allocation_pct }}%"></div>
+                                <span class="small">{{ entry.allocation_pct }}%</span>
+                            </div>
+                        </td>
+                        <td>₹{{ entry.monthly_amount|floatformat:0 }}</td>
+                        <td>{{ entry.suggested_return_pct }}%</td>
+                    </tr>
+                    {% endfor %}
+                    <tr class="table-light fw-bold">
+                        <td>Total</td>
+                        <td>100%</td>
+                        <td>₹{{ plan.total_monthly_sip|floatformat:0 }}</td>
+                        <td>—</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ==================== GOAL PROJECTIONS ==================== -->
+    {% if goal_projections %}
+    <div class="mp-section mb-4">
+        <h4 class="fw-bold mb-3">
+            <i class="bi bi-bullseye me-2"></i>Goal Projections
+        </h4>
+        <div class="row g-3">
+            {% for gp in goal_projections %}
+            <div class="col-md-4">
+                <div class="mp-goal-card">
+                    <h6 class="mb-2">
+                        {% if gp.goal.custom_name %}
+                            {{ gp.goal.custom_name }}
+                        {% else %}
+                            {{ gp.goal.get_goal_type_display }}
+                        {% endif %}
+                    </h6>
+                    <div class="mb-1">
+                        <span class="text-muted small">Target:</span>
+                        <strong>₹{{ gp.goal.target_amount|floatformat:0 }}</strong>
+                        in {{ gp.goal.target_years }} years
+                    </div>
+                    <div class="mb-1">
+                        <span class="text-muted small">SIP needed:</span>
+                        <strong class="text-primary">₹{{ gp.monthly_sip_needed|floatformat:0 }}/mo</strong>
+                    </div>
+                    <div>
+                        <span class="text-muted small">Projected:</span>
+                        <strong class="text-success">₹{{ gp.projected_amount|floatformat:0 }}</strong>
+                    </div>
+                    {% if gp.shortfall < 0 %}
+                    <div class="mt-2">
+                        <span class="badge bg-danger">
+                            Shortfall: ₹{{ gp.shortfall|floatformat:0|cut:"-" }}
+                        </span>
+                    </div>
+                    {% elif gp.shortfall > 0 %}
+                    <div class="mt-2">
+                        <span class="badge bg-success">
+                            Surplus: ₹{{ gp.shortfall|floatformat:0 }}
+                        </span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- ==================== PROJECTION TABLE ==================== -->
+    <div class="mp-section mb-4">
+        <h4 class="fw-bold mb-3">
+            <i class="bi bi-table me-2"></i>Year-by-Year Projection
+        </h4>
+        <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+            <table class="table table-sm align-middle">
+                <thead class="table-light sticky-top">
+                    <tr>
+                        <th>Year</th>
+                        <th>Total Invested</th>
+                        <th>Portfolio Value</th>
+                        <th>Returns</th>
+                        <th>Return %</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr id="projection-data"></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const planId = {{ plan.id }};
+
+    // Fetch chart data from API
+    fetch(`/investments/plan/${planId}/chart-data/`)
+        .then(r => r.json())
+        .then(data => {
+
+            // Allocation Pie Chart
+            const allocCtx = document.getElementById("allocationChart").getContext("2d");
+            new Chart(allocCtx, {
+                type: "doughnut",
+                data: {
+                    labels: data.allocation.labels,
+                    datasets: [{
+                        data: data.allocation.values,
+                        backgroundColor: data.allocation.colors,
+                        borderWidth: 2,
+                    }]
+                },
+                options: {
+                    responsive: false,
+                    plugins: {
+                        legend: { display: false },
+                    },
+                }
+            });
+
+            // Corpus Growth Line Chart
+            const corpusCtx = document.getElementById("corpusChart").getContext("2d");
+            new Chart(corpusCtx, {
+                type: "line",
+                data: {
+                    labels: data.corpus.labels,
+                    datasets: [
+                        {
+                            label: "Portfolio Value",
+                            data: data.corpus.corpus,
+                            borderColor: "#155eef",
+                            backgroundColor: "rgba(21,94,239,0.1)",
+                            fill: true,
+                            tension: 0.3,
+                        },
+                        {
+                            label: "Total Invested",
+                            data: data.corpus.invested,
+                            borderColor: "#94a3b8",
+                            borderDash: [5, 5],
+                            fill: false,
+                            tension: 0.3,
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            ticks: {
+                                callback: v => "₹" + v.toLocaleString("en-IN"),
+                            },
+                        },
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: ctx => ctx.dataset.label + ": ₹" + ctx.raw.toLocaleString("en-IN"),
+                            },
+                        },
+                    },
+                }
+            });
+
+            // Populate projection table
+            const tbody = document.getElementById("projection-data");
+
+            data.corpus.labels.forEach((label, i) => {
+                const invested = data.corpus.invested[i];
+                const value = data.corpus.corpus[i];
+                const returns = value - invested;
+                const returnPct = ((returns / invested) * 100).toFixed(1);
+
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td>${label}</td>
+                    <td>₹${invested.toLocaleString("en-IN")}</td>
+                    <td>₹${value.toLocaleString("en-IN")}</td>
+                    <td class="text-success">₹${returns.toLocaleString("en-IN")}</td>
+                    <td>${returnPct}%</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        });
+});
+</script>
+{% endblock %}

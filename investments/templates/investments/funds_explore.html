@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block title %}Mutual Fund Types | Money Planner{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{% url 'investments:home' %}">Money Planner</a>
+            </li>
+            <li class="breadcrumb-item active">Mutual Fund Types</li>
+        </ol>
+    </nav>
+
+    <!-- Header -->
+    <div class="mp-section mb-4">
+        <h2 class="fw-bold mb-2">
+            <i class="bi bi-collection me-2"></i>Different Types of Mutual Funds
+        </h2>
+        <p class="text-muted mb-0">
+            Every fund category has its own risk level, expected return,
+            and ideal time horizon. Understand them before you invest.
+        </p>
+    </div>
+
+    <!-- Risk-based recommendation -->
+    {% if recommended %}
+    <div class="mp-section border-success mb-4">
+        <h4 class="fw-bold mb-2">
+            <i class="bi bi-star me-2"></i>Recommended For Your Risk Profile
+        </h4>
+        <p class="text-muted mb-3">
+            Based on your profile: <strong>{{ profile.get_risk_tolerance_display }}</strong>
+            (risk score {{ profile.risk_score }}/100).
+        </p>
+        <div class="d-flex flex-wrap gap-2">
+            {% for fund in recommended %}
+            <a href="#{{ fund.key }}" class="p-3 text-decoration-none mp-fund-pill" style="border-color: {{ fund.color }}">
+                <div class="fw-bold" style="color: {{ fund.color }}">{{ fund.name }}</div>
+                <div class="small text-muted">{{ fund.expected_return }}</div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Category cards -->
+    <div class="row g-4">
+        {% for fund in categories %}
+        <div class="col-lg-6" id="{{ fund.key }}">
+            <div class="mp-section h-100" style="border-top: 4px solid {{ fund.color }};">
+                <div class="d-flex align-items-start gap-3 mb-3">
+                    <div class="mp-badge" style="background-color: {{ fund.color }}22; color: {{ fund.color }}">
+                        <i class="bi bi-{{ fund.icon }}"></i>
+                    </div>
+                    <div>
+                        <h4 class="fw-bold mb-1">{{ fund.name }}</h4>
+                        <div class="text-muted small">{{ fund.tagline }}</div>
+                    </div>
+                    <span class="badge ms-auto" style="background-color: {{ fund.color }}; color: #fff">
+                        {{ fund.risk }}
+                    </span>
+                </div>
+
+                <p>
+                    <span class="fw-semibold">Invests in:</span>
+                    {{ fund.invests_in }}
+                </p>
+
+                <!-- Risk bar -->
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between small mb-1">
+                        <span class="fw-semibold">Risk Level</span>
+                        <span>{{ fund.risk_bar }}/100</span>
+                    </div>
+                    <div class="progress" style="height: 8px;">
+                        <div
+                            class="progress-bar"
+                            style="width: {{ fund.risk_bar }}%; background-color: {{ fund.color }};"
+                        ></div>
+                    </div>
+                </div>
+
+                <!-- Key facts grid -->
+                <div class="mp-fund-grid mb-3">
+                    <div>
+                        <div class="mp-data-label">Expected Return</div>
+                        <div class="fw-bold" style="color: {{ fund.color }}">{{ fund.expected_return }}</div>
+                    </div>
+                    <div>
+                        <div class="mp-data-label">Best Horizon</div>
+                        <div class="fw-semibold">{{ fund.best_horizon }}</div>
+                    </div>
+                    <div>
+                        <div class="mp-data-label">Min SIP</div>
+                        <div class="fw-semibold">{{ fund.min_sip }}</div>
+                    </div>
+                    <div>
+                        <div class="mp-data-label">Expense Ratio</div>
+                        <div class="fw-semibold">{{ fund.expense_ratio }}</div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <div class="fw-semibold mb-1">Who it's for:</div>
+                    <div class="small">{{ fund.who_for }}</div>
+                </div>
+
+                <div class="mb-3">
+                    <div class="fw-semibold mb-1">Why choose it:</div>
+                    <div class="small">{{ fund.why_choose }}</div>
+                </div>
+
+                <div class="mb-3">
+                    <div class="fw-semibold mb-1">
+                        <i class="bi bi-exclamation-triangle me-1" style="color: #b91c1c;"></i>
+                        Watch out:
+                    </div>
+                    <div class="small" style="color: #b91c1c;">
+                        {{ fund.cons }}
+                    </div>
+                </div>
+
+                <div>
+                    <span class="fw-semibold small">Example funds:</span>
+                    <div class="mt-1">
+                        {% for ex in fund.examples %}
+                        <span class="badge bg-light text-dark border me-1 mb-1">{{ ex }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Buttons -->
+    <div class="d-flex flex-wrap gap-2 mt-4">
+        <a href="{% url 'investments:mf_vs_fd' %}" class="btn btn-outline-primary">
+            <i class="bi bi-shop me-2"></i>MF vs FD
+        </a>
+        <a href="{% url 'investments:funds_compare' %}" class="btn btn-finance">
+            <i class="bi bi-arrow-left-right me-2"></i>Compare Funds
+        </a>
+    </div>
+
+</div>
+{% endblock %}

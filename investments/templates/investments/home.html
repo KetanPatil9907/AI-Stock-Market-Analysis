@@ -1,12 +1,250 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Money Planner | AI Finance Assistant{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <h1 class="fw-bold">Money Planner</h1>
-    <p class="text-muted">
-        Money planning module coming soon.
-    </p>
+<div class="container py-4">
+
+    <!-- ==================== HERO ==================== -->
+    <div class="mp-hero mb-4">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <span class="badge bg-primary mb-2">Educational Tool</span>
+                <h1 class="fw-bold mb-2">Money Planner</h1>
+                <p class="text-muted mb-0">
+                    Build a personalized investment plan based on your risk
+                    profile, goals, and income. All calculations are
+                    educational approximations.
+                </p>
+            </div>
+            <div class="col-lg-4 text-end d-none d-lg-block">
+                <i class="bi bi-wallet2 mp-hero-icon"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="alert alert-warning disclaimer-alert mb-4">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        <strong>Disclaimer:</strong> This tool is for educational purposes
+        only. It does not constitute financial advice. Consult a
+        certified financial planner before making investment decisions.
+    </div>
+
+    <!-- ==================== QUICK ACTIONS ==================== -->
+    <div class="row g-3 mb-4">
+
+        <!-- Step 1: Risk Assessment -->
+        <div class="col-md-4">
+            <a href="{% url 'investments:risk_assessment' %}" class="text-decoration-none">
+                <div class="mp-step-card {% if profile %}completed{% endif %}">
+                    <div class="mp-step-number">
+                        {% if profile %}
+                            <i class="bi bi-check-circle-fill text-success"></i>
+                        {% else %}
+                            1
+                        {% endif %}
+                    </div>
+                    <h5>Risk Assessment</h5>
+                    <p class="text-muted mb-0">
+                        Answer 8 questions to find your risk tolerance.
+                    </p>
+                    {% if profile %}
+                        <span class="badge bg-success mt-2">
+                            {{ profile.get_risk_tolerance_display }}
+                            ({{ profile.risk_score }}/100)
+                        </span>
+                    {% endif %}
+                </div>
+            </a>
+        </div>
+
+        <!-- Step 2: Profile Setup -->
+        <div class="col-md-4">
+            <a href="{% url 'investments:profile_setup' %}" class="text-decoration-none">
+                <div class="mp-step-card">
+                    <div class="mp-step-number">
+                        {% if profile and profile.monthly_income %}
+                            <i class="bi bi-check-circle-fill text-success"></i>
+                        {% else %}
+                            2
+                        {% endif %}
+                    </div>
+                    <h5>Financial Profile</h5>
+                    <p class="text-muted mb-0">
+                        Enter your income, expenses, and experience level.
+                    </p>
+                </div>
+            </a>
+        </div>
+
+        <!-- Step 3: Goals -->
+        <div class="col-md-4">
+            <a href="{% url 'investments:goals' %}" class="text-decoration-none">
+                <div class="mp-step-card">
+                    <div class="mp-step-number">
+                        {% if goals %}
+                            <i class="bi bi-check-circle-fill text-success"></i>
+                        {% else %}
+                            3
+                        {% endif %}
+                    </div>
+                    <h5>Set Goals</h5>
+                    <p class="text-muted mb-0">
+                        Define what you are saving for and by when.
+                    </p>
+                    {% if goals %}
+                        <span class="badge bg-info mt-2">
+                            {{ goals|length }} goal{{ goals|length|pluralize }}
+                        </span>
+                    {% endif %}
+                </div>
+            </a>
+        </div>
+
+    </div>
+
+    <!-- ==================== GENERATE BUTTON ==================== -->
+    {% if profile and profile.monthly_income and goals %}
+    <div class="text-center mb-4">
+        <a href="{% url 'investments:generate_plan' %}" class="btn btn-finance btn-lg px-5">
+            <i class="bi bi-magic me-2"></i>Generate My Plan
+        </a>
+    </div>
+    {% endif %}
+
+    <!-- ==================== SAVED PLANS ==================== -->
+    {% if saved_plans %}
+    <div class="mp-section mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="fw-bold mb-0">
+                <i class="bi bi-bookmark-check me-2"></i>Saved Plans
+            </h4>
+            <a href="{% url 'investments:saved_plans' %}" class="btn btn-outline-primary btn-sm">
+                View All
+            </a>
+        </div>
+
+        <div class="row g-3">
+            {% for plan in saved_plans|slice:":3" %}
+            <div class="col-md-4">
+                <a href="{% url 'investments:plan_result' plan.id %}" class="text-decoration-none">
+                    <div class="mp-plan-card">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="badge bg-primary">
+                                {{ plan.investor_profile.get_risk_tolerance_display }}
+                            </span>
+                            <span class="text-muted small">
+                                {{ plan.created_at|date:"d M Y" }}
+                            </span>
+                        </div>
+                        <h5 class="mb-1">SIP ₹{{ plan.total_monthly_sip|floatformat:0 }}/mo</h5>
+                        <p class="text-muted small mb-2">
+                            {{ plan.equity_pct }}% Equity | {{ plan.debt_pct }}% Debt
+                        </p>
+                        <div class="d-flex gap-2">
+                            <span class="badge bg-light text-dark">
+                                10y: ₹{{ plan.projected_corpus_10y|floatformat:0 }}
+                            </span>
+                            <span class="badge bg-light text-dark">
+                                20y: ₹{{ plan.projected_corpus_20y|floatformat:0 }}
+                            </span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- ==================== TOOLS ==================== -->
+    <div class="mp-section">
+        <h4 class="fw-bold mb-3">
+            <i class="bi bi-tools me-2"></i>Investment Calculators
+        </h4>
+        <div class="row g-3">
+            <div class="col-md-6">
+                <a href="{% url 'investments:sip_calculator' %}" class="text-decoration-none">
+                    <div class="mp-tool-card">
+                        <div class="mp-tool-icon">
+                            <i class="bi bi-calculator"></i>
+                        </div>
+                        <h5>SIP Calculator</h5>
+                        <p class="text-muted mb-0">
+                            Calculate the future value of your monthly
+                            systematic investment plan.
+                        </p>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-6">
+                <a href="{% url 'investments:lumpsum_calculator' %}" class="text-decoration-none">
+                    <div class="mp-tool-card">
+                        <div class="mp-tool-icon">
+                            <i class="bi bi-cash-stack"></i>
+                        </div>
+                        <h5>Lump Sum Calculator</h5>
+                        <p class="text-muted mb-0">
+                            See how a one-time investment grows over time
+                            with compound returns.
+                        </p>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== MUTUAL FUNDS EDUCATION ==================== -->
+    <div class="mp-section">
+        <h4 class="fw-bold mb-3">
+            <i class="bi bi-collection me-2"></i>Mutual Funds Education & Compare
+        </h4>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <a href="{% url 'investments:mf_vs_fd' %}" class="text-decoration-none">
+                    <div class="mp-tool-card">
+                        <div class="mp-tool-icon">
+                            <i class="bi bi-shop"></i>
+                        </div>
+                        <h5>MF vs FD</h5>
+                        <p class="text-muted mb-0">
+                            Understand why mutual funds beat fixed deposits
+                            for long-term growth.
+                        </p>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-4">
+                <a href="{% url 'investments:funds_explore' %}" class="text-decoration-none">
+                    <div class="mp-tool-card">
+                        <div class="mp-tool-icon">
+                            <i class="bi bi-grid-3x3-gap"></i>
+                        </div>
+                        <h5>Fund Types</h5>
+                        <p class="text-muted mb-0">
+                            Large, mid, small, multi, flexi, ELSS, index,
+                            debt and more — explained simply.
+                        </p>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-4">
+                <a href="{% url 'investments:funds_compare' %}" class="text-decoration-none">
+                    <div class="mp-tool-card">
+                        <div class="mp-tool-icon">
+                            <i class="bi bi-arrow-left-right"></i>
+                        </div>
+                        <h5>Compare Funds</h5>
+                        <p class="text-muted mb-0">
+                            Pick funds side-by-side and see which is best
+                            for your risk profile.
+                        </p>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+
 </div>
 {% endblock %}

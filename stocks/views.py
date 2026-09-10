@@ -60,6 +60,33 @@ def analysis_detail(request, symbol):
     except MarketDataServiceError:
         historical = {"labels": [], "prices": [], "volumes": []}
 
+    technical_indicators = {}
+    try:
+        from services.technical_indicators import compute_all_indicators
+        technical_indicators = compute_all_indicators(historical.get("prices", []))
+    except Exception as e:
+        logger.warning("Technical indicators failed for %s: %s", symbol, e)
+
+    dividend_data = {"dividends": [], "total_dividends": 0, "avg_dividend": 0}
+    try:
+        dividend_data = market_service.get_dividend_history(symbol)
+    except Exception as e:
+        logger.warning("Dividend data failed for %s: %s", symbol, e)
+
+    insider_data = {"transactions": [], "summary": {}}
+    try:
+        insider_data = market_service.get_insider_transactions(symbol)
+    except Exception as e:
+        logger.warning("Insider data failed for %s: %s", symbol, e)
+
+    peer_data = []
+    try:
+        sector = fundamentals.get("sector", "")
+        industry = fundamentals.get("industry", "")
+        peer_data = market_service.get_peer_stocks(sector, industry, symbol)
+    except Exception as e:
+        logger.warning("Peer data failed for %s: %s", symbol, e)
+
     analysis = stock_agent.analyze(quote, fundamentals)
 
     stock_obj, _ = Stock.objects.update_or_create(
@@ -77,8 +104,13 @@ def analysis_detail(request, symbol):
         "quote": quote,
         "fundamentals": fundamentals,
         "historical_json": json.dumps(historical),
+        "technical_indicators_json": json.dumps(technical_indicators),
         "analysis": analysis,
         "stock_id": stock_obj.id,
+        "technical_indicators": technical_indicators,
+        "dividend_data": dividend_data,
+        "insider_data": insider_data,
+        "peer_data": peer_data,
     })
     return render(request, "stocks/analysis_detail.html", context)
 

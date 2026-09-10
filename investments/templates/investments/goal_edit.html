@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Goal | Money Planner{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{% url 'investments:home' %}">Money Planner</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{% url 'investments:goals' %}">Goals</a>
+            </li>
+            <li class="breadcrumb-item active">Edit</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+
+            <div class="mp-section">
+                <h3 class="fw-bold mb-3">
+                    <i class="bi bi-pencil-square me-2"></i>Edit Goal
+                </h3>
+
+                <form method="post" novalidate>
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label for="{{ form.goal_type.id_for_label }}" class="form-label fw-semibold">
+                            Goal Type
+                        </label>
+                        {{ form.goal_type }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.custom_name.id_for_label }}" class="form-label fw-semibold">
+                            Custom Name (optional)
+                        </label>
+                        {{ form.custom_name }}
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-6">
+                            <label for="{{ form.target_amount.id_for_label }}" class="form-label fw-semibold">
+                                Target Amount (₹)
+                            </label>
+                            {{ form.target_amount }}
+                            {% if form.target_amount.errors %}
+                                <div class="text-danger small">{{ form.target_amount.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-6">
+                            <label for="{{ form.target_years.id_for_label }}" class="form-label fw-semibold">
+                                Years
+                            </label>
+                            {{ form.target_years }}
+                            {% if form.target_years.errors %}
+                                <div class="text-danger small">{{ form.target_years.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.priority.id_for_label }}" class="form-label fw-semibold">
+                            Priority (1 = highest)
+                        </label>
+                        {{ form.priority }}
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-finance flex-fill">
+                            <i class="bi bi-check-lg me-2"></i>Save Changes
+                        </button>
+                        <a href="{% url 'investments:goals' %}" class="btn btn-outline-secondary">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Get Stock Recommendations{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="bi bi-robot"></i> Get Personalized Recommendations
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" id="prediction-form">
+                        {% csrf_token %}
+
+                        <!-- Investment Amount -->
+                        <div class="mb-4">
+                            <label for="investment-amount" class="form-label fw-bold">
+                                <i class="bi bi-currency-rupee"></i> How much do you want to invest?
+                            </label>
+                            {{ form.investment_amount }}
+                            {% if form.investment_amount.errors %}
+                                <div class="text-danger mt-1">{{ form.investment_amount.errors }}</div>
+                            {% endif %}
+                            <div class="form-text">Minimum amount: Rs. 1,000</div>
+                        </div>
+
+                        <!-- Risk Level -->
+                        <div class="mb-4">
+                            <label for="risk-level" class="form-label fw-bold">
+                                <i class="bi bi-shield-check"></i> What's your risk tolerance?
+                            </label>
+                            {{ form.risk_level }}
+                            {% if form.risk_level.errors %}
+                                <div class="text-danger mt-1">{{ form.risk_level.errors }}</div>
+                            {% endif %}
+
+                            <!-- Risk Level Visual Guide -->
+                            <div class="mt-3">
+                                <div class="d-flex justify-content-between">
+                                    <small class="text-success">Low Risk</small>
+                                    <small class="text-danger">High Risk</small>
+                                </div>
+                                <div class="progress" style="height: 8px;">
+                                    <div class="progress-bar bg-success" style="width: 20%"></div>
+                                    <div class="progress-bar bg-info" style="width: 20%"></div>
+                                    <div class="progress-bar bg-warning" style="width: 20%"></div>
+                                    <div class="progress-bar bg-orange" style="width: 20%; background-color: #fd7e14;"></div>
+                                    <div class="progress-bar bg-danger" style="width: 20%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Market Selection -->
+                        <div class="mb-4">
+                            <label for="market-select" class="form-label fw-bold">
+                                <i class="bi bi-globe"></i> Which market?
+                            </label>
+                            {{ form.market }}
+                            {% if form.market.errors %}
+                                <div class="text-danger mt-1">{{ form.market.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Investment Horizon -->
+                        <div class="mb-4">
+                            <label for="investment-horizon" class="form-label fw-bold">
+                                <i class="bi bi-calendar-range"></i> Investment horizon (months)
+                            </label>
+                            {{ form.investment_horizon }}
+                            {% if form.investment_horizon.errors %}
+                                <div class="text-danger mt-1">{{ form.investment_horizon.errors }}</div>
+                            {% endif %}
+                            <div class="form-text">How long do you plan to stay invested?</div>
+                        </div>
+
+                        <!-- Asset Types -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">
+                                <i class="bi bi-collection"></i> Include in recommendations:
+                            </label>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                        {{ form.include_stocks }}
+                                        <label class="form-check-label" for="id_include_stocks">
+                                            Stocks
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                        {{ form.include_mf }}
+                                        <label class="form-check-label" for="id_include_mf">
+                                            Mutual Funds
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                        {{ form.include_etf }}
+                                        <label class="form-check-label" for="id_include_etf">
+                                            ETFs
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg" id="submit-btn">
+                                <i class="bi bi-lightning-charge"></i> Get Recommendations
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Info Cards -->
+            <div class="row mt-4">
+                <div class="col-md-4">
+                    <div class="card border-info h-100">
+                        <div class="card-body text-center">
+                            <i class="bi bi-cpu display-4 text-info"></i>
+                            <h6 class="mt-2">ML Predictions</h6>
+                            <p class="small text-muted">Advanced technical analysis with price predictions</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-success h-100">
+                        <div class="card-body text-center">
+                            <i class="bi bi-emoji-smile display-4 text-success"></i>
+                            <h6 class="mt-2">Sentiment Analysis</h6>
+                            <p class="small text-muted">Market sentiment and analyst recommendations</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-warning h-100">
+                        <div class="card-body text-center">
+                            <i class="bi bi-shield-check display-4 text-warning"></i>
+                            <h6 class="mt-2">Risk-Based</h6>
+                            <p class="small text-muted">Recommendations matched to your risk profile</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('prediction-form').addEventListener('submit', function() {
+    var btn = document.getElementById('submit-btn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Analyzing Markets...';
+});
+</script>
+{% endblock %}

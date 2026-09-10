@@ -1,0 +1,862 @@
+/* =========================================================
+   AI FINANCE ASSISTANT - STOCK ANALYSIS ENHANCED
+   ========================================================= */
+
+.analysis-page {
+    min-height: 100vh;
+    background: #f5f7fa;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.analysis-header {
+    background: linear-gradient(135deg, #10404a 0%, #1a5c6a 100%);
+    padding: 16px 0 28px;
+    color: white;
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: rgba(255,255,255,0.7);
+    text-decoration: none;
+    font-size: 13px;
+    margin-bottom: 14px;
+    transition: color 0.2s;
+}
+
+.back-link:hover {
+    color: white;
+}
+
+.stock-header-row {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    flex-wrap: wrap;
+}
+
+.stock-logo {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    background: white;
+    padding: 4px;
+    object-fit: contain;
+}
+
+.stock-info {
+    flex: 1;
+}
+
+.stock-info h1 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.stock-meta {
+    display: flex;
+    gap: 8px;
+    margin-top: 6px;
+    flex-wrap: wrap;
+}
+
+.meta-badge {
+    background: rgba(255,255,255,0.15);
+    padding: 3px 10px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.stock-price-block {
+    text-align: right;
+}
+
+.current-price {
+    font-size: 32px;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.price-change {
+    font-size: 14px;
+    font-weight: 600;
+    margin-top: 2px;
+}
+
+.price-change.positive { color: #4ade80; }
+.price-change.negative { color: #f87171; }
+
+
+/* =========================================================
+   SECTIONS & CARDS
+   ========================================================= */
+
+.analysis-section {
+    padding: 20px 0;
+}
+
+.section-card {
+    background: white;
+    border-radius: 14px;
+    border: 1px solid #e2e8f0;
+    padding: 24px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.section-header h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a2735;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.section-header h2 i {
+    color: #10404a;
+}
+
+
+/* =========================================================
+   CHART
+   ========================================================= */
+
+.chart-wrapper {
+    position: relative;
+    height: 420px;
+}
+
+.chart-period-badge {
+    background: #e8f0f2;
+    color: #10404a;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   TECHNICAL INDICATORS
+   ========================================================= */
+
+.indicators-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 14px;
+    margin-bottom: 24px;
+}
+
+.indicator-badge {
+    background: #f8fafb;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 14px;
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.indicator-badge:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.indicator-badge .badge-label {
+    font-size: 11px;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+.indicator-badge .badge-value {
+    font-size: 22px;
+    font-weight: 700;
+    margin: 6px 0;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.indicator-badge .badge-signal {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.indicator-badge.bullish {
+    border-color: #86efac;
+    background: #f0fdf4;
+}
+
+.indicator-badge.bullish .badge-value { color: #16a34a; }
+.indicator-badge.bullish .badge-signal { color: #16a34a; background: #dcfce7; }
+
+.indicator-badge.bearish {
+    border-color: #fca5a5;
+    background: #fef2f2;
+}
+
+.indicator-badge.bearish .badge-value { color: #dc2626; }
+.indicator-badge.bearish .badge-signal { color: #dc2626; background: #fee2e2; }
+
+.indicator-badge.neutral {
+    border-color: #d1d5db;
+    background: #f9fafb;
+}
+
+.indicator-badge.neutral .badge-value { color: #6b7280; }
+.indicator-badge.neutral .badge-signal { color: #6b7280; background: #f3f4f6; }
+
+.indicator-badge.overbought {
+    border-color: #fbbf24;
+    background: #fffbeb;
+}
+
+.indicator-badge.overbought .badge-value { color: #d97706; }
+.indicator-badge.overbought .badge-signal { color: #d97706; background: #fef3c7; }
+
+.indicator-badge.oversold {
+    border-color: #60a5fa;
+    background: #eff6ff;
+}
+
+.indicator-badge.oversold .badge-value { color: #2563eb; }
+.indicator-badge.oversold .badge-signal { color: #2563eb; background: #dbeafe; }
+
+
+/* =========================================================
+   FUNDAMENTALS
+   ========================================================= */
+
+.fundamentals-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 14px;
+}
+
+.fund-item {
+    background: #f8fafb;
+    border: 1px solid #e8ecf0;
+    border-radius: 10px;
+    padding: 14px;
+    text-align: center;
+}
+
+.fund-label {
+    font-size: 11px;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.fund-value {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1a2735;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+
+/* =========================================================
+   AI ANALYSIS
+   ========================================================= */
+
+.ai-badge {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.overview-box {
+    background: #f0f4f8;
+    border-left: 4px solid #10404a;
+    border-radius: 0 8px 8px 0;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+}
+
+.overview-box h3 {
+    margin: 0 0 8px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #1a2735;
+}
+
+.overview-box p {
+    margin: 0;
+    font-size: 14px;
+    color: #4b5563;
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   SCORES
+   ========================================================= */
+
+.scores-grid {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+}
+
+.score-card {
+    text-align: center;
+}
+
+.score-ring {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: conic-gradient(
+        #10404a 0%,
+        #10404a var(--score),
+        #e8ecf0 var(--score),
+        #e8ecf0 100%
+    );
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 8px;
+    position: relative;
+}
+
+.score-ring::before {
+    content: '';
+    width: 60px;
+    height: 60px;
+    background: white;
+    border-radius: 50%;
+    position: absolute;
+}
+
+.score-num {
+    position: relative;
+    z-index: 1;
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a2735;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.score-card.overall .score-ring {
+    width: 100px;
+    height: 100px;
+}
+
+.score-card.overall .score-ring::before {
+    width: 76px;
+    height: 76px;
+}
+
+.score-card.overall .score-num {
+    font-size: 26px;
+}
+
+.score-label {
+    font-size: 12px;
+    color: #6b7280;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+
+/* =========================================================
+   CLASSIFICATION
+   ========================================================= */
+
+.classification-box {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.classification-label {
+    display: inline-block;
+    padding: 8px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.classification-strong_buy {
+    background: #dcfce7;
+    color: #166534;
+    border: 2px solid #86efac;
+}
+
+.classification-buy {
+    background: #dbeafe;
+    color: #1e40af;
+    border: 2px solid #93c5fd;
+}
+
+.classification-hold {
+    background: #fef3c7;
+    color: #92400e;
+    border: 2px solid #fcd34d;
+}
+
+.classification-sell {
+    background: #fee2e2;
+    color: #991b1b;
+    border: 2px solid #fca5a5;
+}
+
+.classification-strong_sell {
+    background: #fecaca;
+    color: #7f1d1d;
+    border: 2px solid #f87171;
+}
+
+.classification-neutral {
+    background: #f3f4f6;
+    color: #374151;
+    border: 2px solid #d1d5db;
+}
+
+
+/* =========================================================
+   SWOT DETAILS
+   ========================================================= */
+
+.analysis-details {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.detail-column {
+    padding: 16px;
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+}
+
+.detail-column h4 {
+    margin: 0 0 12px;
+    font-size: 14px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.detail-column ul {
+    margin: 0;
+    padding-left: 16px;
+}
+
+.detail-column li {
+    font-size: 13px;
+    color: #4b5563;
+    line-height: 1.5;
+    margin-bottom: 6px;
+}
+
+.strengths { background: #f0fdf4; border-color: #bbf7d0; }
+.strengths h4 { color: #166534; }
+.strengths i { color: #22c55e; }
+
+.weaknesses { background: #fef2f2; border-color: #fecaca; }
+.weaknesses h4 { color: #991b1b; }
+.weaknesses i { color: #ef4444; }
+
+.opportunities { background: #eff6ff; border-color: #bfdbfe; }
+.opportunities h4 { color: #1e40af; }
+.opportunities i { color: #3b82f6; }
+
+.risks { background: #fffbeb; border-color: #fde68a; }
+.risks h4 { color: #92400e; }
+.risks i { color: #f59e0b; }
+
+
+/* =========================================================
+   CONCLUSION
+   ========================================================= */
+
+.conclusion-box {
+    background: linear-gradient(135deg, #f0f4f8 0%, #e8f0f2 100%);
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.conclusion-box h4 {
+    margin: 0 0 8px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #1a2735;
+}
+
+.conclusion-box p {
+    margin: 0;
+    font-size: 14px;
+    color: #374151;
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   SAVE FORM
+   ========================================================= */
+
+.save-form {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.save-form .btn {
+    padding: 10px 28px;
+    font-weight: 600;
+    border-radius: 8px;
+    background: #10404a;
+    border-color: #10404a;
+}
+
+.save-form .btn:hover {
+    background: #0d3239;
+}
+
+
+/* =========================================================
+   PEERS
+   ========================================================= */
+
+.peers-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px;
+}
+
+.peer-card {
+    background: #f8fafb;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 16px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.2s;
+    text-align: center;
+}
+
+.peer-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+    border-color: #10404a;
+    color: inherit;
+}
+
+.peer-symbol {
+    font-size: 18px;
+    font-weight: 700;
+    color: #10404a;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.peer-name {
+    font-size: 12px;
+    color: #6b7280;
+    margin: 4px 0 10px;
+    line-height: 1.3;
+}
+
+.peer-action {
+    font-size: 11px;
+    color: #10404a;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+
+/* =========================================================
+   DIVIDEND & INSIDER TABLES
+   ========================================================= */
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table th {
+    text-align: left;
+    padding: 12px 14px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid #e5e7eb;
+    background: #f9fafb;
+}
+
+.data-table td {
+    padding: 10px 14px;
+    font-size: 13px;
+    color: #374151;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.data-table tbody tr:hover {
+    background: #f9fafb;
+}
+
+.data-table .amount {
+    font-weight: 600;
+    font-family: 'JetBrains Mono', monospace;
+    color: #16a34a;
+}
+
+.dividend-summary {
+    display: flex;
+    gap: 20px;
+}
+
+.summary-item {
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.summary-item strong {
+    color: #1a2735;
+}
+
+
+/* =========================================================
+   ACTION BADGES (INSIDER)
+   ========================================================= */
+
+.action-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.action-purchase {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.action-sale {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.action-grant {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.action-exercise {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.action-unknown {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+
+/* =========================================================
+   INSIDER SENTIMENT
+   ========================================================= */
+
+.insider-sentiment {
+    font-size: 12px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+.insider-sentiment.net_buying {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.insider-sentiment.net_selling {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.insider-sentiment.balanced {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+
+/* =========================================================
+   DISCLAIMER
+   ========================================================= */
+
+.disclaimer-box {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 10px;
+    padding: 16px 20px;
+}
+
+.disclaimer-box i {
+    color: #f59e0b;
+    font-size: 20px;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.disclaimer-box p {
+    margin: 0;
+    font-size: 13px;
+    color: #92400e;
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 768px) {
+    .analysis-header {
+        padding: 14px 0 20px;
+    }
+
+    .stock-header-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .stock-info h1 {
+        font-size: 22px;
+    }
+
+    .current-price {
+        font-size: 24px;
+    }
+
+    .stock-price-block {
+        text-align: left;
+    }
+
+    .chart-wrapper {
+        height: 280px;
+    }
+
+    .indicators-summary {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .fundamentals-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .analysis-details {
+        grid-template-columns: 1fr;
+    }
+
+    .peers-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .scores-grid {
+        gap: 16px;
+    }
+
+    .score-ring {
+        width: 64px;
+        height: 64px;
+    }
+
+    .score-ring::before {
+        width: 48px;
+        height: 48px;
+    }
+
+    .score-num {
+        font-size: 16px;
+    }
+
+    .score-card.overall .score-ring {
+        width: 80px;
+        height: 80px;
+    }
+
+    .score-card.overall .score-ring::before {
+        width: 60px;
+        height: 60px;
+    }
+
+    .score-card.overall .score-num {
+        font-size: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .section-card {
+        padding: 16px;
+    }
+
+    .indicators-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .fundamentals-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .peers-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .dividend-summary {
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .data-table {
+        font-size: 12px;
+    }
+
+    .data-table th,
+    .data-table td {
+        padding: 8px 10px;
+    }
+}

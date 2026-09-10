@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Portfolio Tracker{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2><i class="bi bi-wallet2"></i> Portfolio Tracker</h2>
+        </div>
+    </div>
+
+    <!-- Portfolio Summary -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card border-primary">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">Total Invested</h6>
+                    <h3>Rs. {{ total_invested|floatformat:0 }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-success">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">Current Value</h6>
+                    <h3>Rs. {{ total_current|floatformat:0 }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-{% if total_pnl >= 0 %}success{% else %}danger{% endif %}">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">Total P&L</h6>
+                    <h3 class="{% if total_pnl >= 0 %}text-success{% else %}text-danger{% endif %}">
+                        Rs. {{ total_pnl|floatformat:0 }}
+                    </h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-info">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">P&L %</h6>
+                    <h3 class="{% if pnl_pct >= 0 %}text-success{% else %}text-danger{% endif %}">
+                        {{ pnl_pct|floatformat:2 }}%
+                    </h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Add Holding Form -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="bi bi-plus-circle"></i> Add Holding</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{% url 'predictions:add_holding' %}">
+                        {% csrf_token %}
+                        {% for field in form %}
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}
+                                <div class="text-danger small">{{ field.errors }}</div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                        <button type="submit" class="btn btn-success w-100">
+                            <i class="bi bi-plus-lg"></i> Add to Portfolio
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Holdings List -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-list-ul"></i> Your Holdings ({{ holdings.count }})</h5>
+                </div>
+                <div class="card-body p-0">
+                    {% if holdings %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Symbol</th>
+                                    <th>Qty</th>
+                                    <th>Buy Price</th>
+                                    <th>Current</th>
+                                    <th>Invested</th>
+                                    <th>Current Value</th>
+                                    <th>P&L</th>
+                                    <th>P&L %</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for holding in holdings %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ holding.symbol }}</strong>
+                                        <br>
+                                        <small class="text-muted">{{ holding.company_name|truncatechars:20 }}</small>
+                                    </td>
+                                    <td>{{ holding.quantity }}</td>
+                                    <td>Rs. {{ holding.buy_price|floatformat:2 }}</td>
+                                    <td>Rs. {{ holding.current_price|floatformat:2 }}</td>
+                                    <td>Rs. {{ holding.invested_amount|floatformat:0 }}</td>
+                                    <td>Rs. {{ holding.current_value|floatformat:0 }}</td>
+                                    <td class="{% if holding.profit_loss >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                        Rs. {{ holding.profit_loss|floatformat:0 }}
+                                    </td>
+                                    <td class="{% if holding.profit_loss_pct >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                        {{ holding.profit_loss_pct|floatformat:2 }}%
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'predictions:edit_holding' holding.pk %}" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <form method="post" action="{% url 'predictions:delete_holding' holding.pk %}" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this holding?')">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-inbox display-1 text-muted"></i>
+                        <p class="text-muted mt-3">No holdings yet. Add your first investment!</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

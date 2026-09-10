@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Saved Plans | Money Planner{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{% url 'investments:home' %}">Money Planner</a>
+            </li>
+            <li class="breadcrumb-item active">Saved Plans</li>
+        </ol>
+    </nav>
+
+    <div class="mp-section">
+        <h2 class="fw-bold mb-3">
+            <i class="bi bi-bookmark-check me-2"></i>Saved Plans
+        </h2>
+
+        {% if plans %}
+        <div class="row g-3">
+            {% for plan in plans %}
+            <div class="col-md-6 col-lg-4">
+                <div class="mp-plan-card">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="badge bg-primary">
+                            {{ plan.investor_profile.get_risk_tolerance_display }}
+                        </span>
+                        <span class="text-muted small">
+                            {{ plan.created_at|date:"d M Y" }}
+                        </span>
+                    </div>
+
+                    <h5 class="mb-2">
+                        Monthly SIP: ₹{{ plan.total_monthly_sip|floatformat:0 }}
+                    </h5>
+
+                    <div class="mb-2">
+                        <div class="d-flex gap-2 flex-wrap">
+                            <span class="badge bg-light text-dark">
+                                Equity {{ plan.equity_pct }}%
+                            </span>
+                            <span class="badge bg-light text-dark">
+                                Debt {{ plan.debt_pct }}%
+                            </span>
+                            <span class="badge bg-light text-dark">
+                                Gold {{ plan.gold_pct }}%
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <div class="small text-muted">10y Corpus</div>
+                            <div class="fw-bold text-success">
+                                ₹{{ plan.projected_corpus_10y|floatformat:0 }}
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="small text-muted">20y Corpus</div>
+                            <div class="fw-bold text-success">
+                                ₹{{ plan.projected_corpus_20y|floatformat:0 }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'investments:plan_result' plan.id %}" class="btn btn-sm btn-finance flex-fill">
+                            <i class="bi bi-eye me-1"></i>View
+                        </a>
+                        <form method="post" action="{% url 'investments:delete_plan' plan.id %}" onsubmit="return confirm('Delete this plan?')">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-bookmark mp-empty-icon"></i>
+            <p class="text-muted mt-2">No saved plans yet.</p>
+            <a href="{% url 'investments:home' %}" class="btn btn-finance">
+                <i class="bi bi-plus me-1"></i>Create Your First Plan
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,280 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Forecast: {{ forecast.symbol }} | AI Finance Assistant{% endblock %}
+
+{% block extra_css %}
+<style>
+    .forecast-hero {
+        padding: 40px 0 24px;
+        background: linear-gradient(135deg, #0a1628 0%, #1a3a5c 100%);
+        color: #fff;
+    }
+    .forecast-hero .back-link { color: rgba(255,255,255,0.7); text-decoration: none; font-size: 0.9rem; }
+    .forecast-hero .back-link:hover { color: #fff; }
+    .forecast-hero h1 { font-weight: 800; font-size: 2rem; margin: 12px 0 4px; }
+    .forecast-hero .sub { opacity: 0.8; }
+    .forecast-hero .price-block { margin-top: 16px; display: flex; align-items: baseline; gap: 16px; }
+    .forecast-hero .big-price { font-size: 2.2rem; font-weight: 700; }
+    .forecast-hero .signal-pill {
+        padding: 6px 18px; border-radius: 24px; font-weight: 700; font-size: 0.9rem;
+    }
+    .signal-STRONG_BUY { background: #d1fae5; color: #065f46; }
+    .signal-BUY { background: #dbeafe; color: #1e40af; }
+    .signal-HOLD { background: #fef3c7; color: #92400e; }
+    .signal-SELL { background: #fee2e2; color: #991b1b; }
+    .signal-STRONG_SELL { background: #fecaca; color: #7f1d1d; }
+
+    .section-card {
+        background: #fff;
+        border-radius: 14px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        border: 1px solid rgba(0,0,0,0.04);
+        padding: 24px;
+        margin-bottom: 20px;
+    }
+    .section-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 16px; }
+
+    .targets-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+    .target-card {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 20px;
+        text-align: center;
+    }
+    .target-card .t-label { font-size: 0.8rem; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px; }
+    .target-card .t-price { font-size: 1.5rem; font-weight: 700; margin: 6px 0; }
+    .target-card .t-return { font-size: 1.1rem; font-weight: 600; }
+    .target-card .t-return.positive { color: #10b981; }
+    .target-card .t-return.negative { color: #ef4444; }
+
+    .scores-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 12px;
+    }
+    .score-pill {
+        text-align: center;
+        padding: 16px 8px;
+        border-radius: 12px;
+        background: #f8f9fa;
+    }
+    .score-pill .sp-val { font-size: 1.4rem; font-weight: 700; }
+    .score-pill .sp-lbl { font-size: 0.7rem; color: #6c757d; text-transform: uppercase; margin-top: 4px; }
+
+    .bar-track {
+        background: #e9ecef;
+        border-radius: 8px;
+        height: 8px;
+        margin-top: 6px;
+        overflow: hidden;
+    }
+    .bar-fill { height: 100%; border-radius: 8px; }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 12px;
+    }
+    .info-item {
+        padding: 12px;
+        background: #f8f9fa;
+        border-radius: 10px;
+    }
+    .info-item .ii-label { font-size: 0.72rem; color: #6c757d; text-transform: uppercase; }
+    .info-item .ii-value { font-size: 1rem; font-weight: 600; margin-top: 2px; }
+
+    .reasons-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    .reasons-list li {
+        padding: 10px 14px;
+        border-left: 3px solid #0d6efd;
+        background: #f0f7ff;
+        border-radius: 0 8px 8px 0;
+        margin-bottom: 8px;
+        font-size: 0.9rem;
+    }
+
+    .disclaimer-box {
+        background: #fff3cd;
+        border: 1px solid #ffc107;
+        border-radius: 10px;
+        padding: 16px 20px;
+        margin: 30px 0;
+        font-size: 0.82rem;
+        color: #664d03;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="forecast-hero">
+    <div class="container">
+        <a href="{% url 'predictions:future_recommendations' %}" class="back-link">
+            <i class="bi bi-arrow-left"></i> Back to Recommendations
+        </a>
+        <h1>{{ forecast.symbol }}</h1>
+        <div class="sub">{{ forecast.name }} &mdash; {{ forecast.sector }}</div>
+        <div class="price-block">
+            <span class="big-price">₹{{ forecast.current_price|floatformat:2 }}</span>
+            <span class="signal-pill signal-{{ forecast.signal }}">{{ forecast.signal|replace:"_"," " }}</span>
+            <span style="opacity:0.7; font-size:0.9rem;">Score: {{ forecast.composite_score }}/100</span>
+        </div>
+    </div>
+</section>
+
+<div class="container" style="margin-top: -16px;">
+
+    <div class="section-card">
+        <h3><i class="bi bi-bullseye me-1"></i> Price Targets</h3>
+        <div class="targets-grid">
+            {% if forecast.target_3m %}
+            <div class="target-card">
+                <div class="t-label">3 Month Target</div>
+                <div class="t-price">₹{{ forecast.target_3m|floatformat:2 }}</div>
+                <div class="t-return {% if forecast.return_3m_pct > 0 %}positive{% elif forecast.return_3m_pct < 0 %}negative{% endif %}">
+                    {% if forecast.return_3m_pct > 0 %}+{% endif %}{{ forecast.return_3m_pct|floatformat:1 }}% expected return
+                </div>
+            </div>
+            {% endif %}
+            {% if forecast.target_6m %}
+            <div class="target-card">
+                <div class="t-label">6 Month Target</div>
+                <div class="t-price">₹{{ forecast.target_6m|floatformat:2 }}</div>
+                <div class="t-return {% if forecast.return_6m_pct > 0 %}positive{% elif forecast.return_6m_pct < 0 %}negative{% endif %}">
+                    {% if forecast.return_6m_pct > 0 %}+{% endif %}{{ forecast.return_6m_pct|floatformat:1 }}% expected return
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="section-card">
+        <h3><i class="bi bi-speedometer2 me-1"></i> Multi-Factor Scores</h3>
+        <div class="scores-row">
+            <div class="score-pill">
+                <div class="sp-val" style="color:{% if forecast.momentum_score > 60 %}#10b981{% elif forecast.momentum_score < 40 %}#ef4444{% else %}#6c757d{% endif %}">{{ forecast.momentum_score }}</div>
+                <div class="sp-lbl">Momentum</div>
+                <div class="bar-track"><div class="bar-fill" style="width:{{ forecast.momentum_score }}%; background:{% if forecast.momentum_score > 60 %}#10b981{% elif forecast.momentum_score < 40 %}#ef4444{% else %}#6c757d{% endif %}"></div></div>
+            </div>
+            <div class="score-pill">
+                <div class="sp-val" style="color:{% if forecast.fundamental_score > 60 %}#10b981{% elif forecast.fundamental_score < 40 %}#ef4444{% else %}#6c757d{% endif %}">{{ forecast.fundamental_score }}</div>
+                <div class="sp-lbl">Fundamentals</div>
+                <div class="bar-track"><div class="bar-fill" style="width:{{ forecast.fundamental_score }}%; background:{% if forecast.fundamental_score > 60 %}#10b981{% elif forecast.fundamental_score < 40 %}#ef4444{% else %}#6c757d{% endif %}"></div></div>
+            </div>
+            <div class="score-pill">
+                <div class="sp-val" style="color:{% if forecast.valuation_score > 60 %}#10b981{% elif forecast.valuation_score < 40 %}#ef4444{% else %}#6c757d{% endif %}">{{ forecast.valuation_score }}</div>
+                <div class="sp-lbl">Valuation</div>
+                <div class="bar-track"><div class="bar-fill" style="width:{{ forecast.valuation_score }}%; background:{% if forecast.valuation_score > 60 %}#10b981{% elif forecast.valuation_score < 40 %}#ef4444{% else %}#6c757d{% endif %}"></div></div>
+            </div>
+            <div class="score-pill">
+                <div class="sp-val" style="color:{% if forecast.relative_strength_score > 60 %}#10b981{% elif forecast.relative_strength_score < 40 %}#ef4444{% else %}#6c757d{% endif %}">{{ forecast.relative_strength_score }}</div>
+                <div class="sp-lbl">Rel. Strength</div>
+                <div class="bar-track"><div class="bar-fill" style="width:{{ forecast.relative_strength_score }}%; background:{% if forecast.relative_strength_score > 60 %}#10b981{% elif forecast.relative_strength_score < 40 %}#ef4444{% else %}#6c757d{% endif %}"></div></div>
+            </div>
+            <div class="score-pill">
+                <div class="sp-val" style="color:{% if forecast.volume_score > 60 %}#10b981{% elif forecast.volume_score < 40 %}#ef4444{% else %}#6c757d{% endif %}">{{ forecast.volume_score }}</div>
+                <div class="sp-lbl">Volume</div>
+                <div class="bar-track"><div class="bar-fill" style="width:{{ forecast.volume_score }}%; background:{% if forecast.volume_score > 60 %}#10b981{% elif forecast.volume_score < 40 %}#ef4444{% else %}#6c757d{% endif %}"></div></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-card">
+        <h3><i class="bi bi-clipboard-data me-1"></i> Key Metrics</h3>
+        <div class="info-grid">
+            {% if forecast.current_price %}
+            <div class="info-item">
+                <div class="ii-label">Current Price</div>
+                <div class="ii-value">₹{{ forecast.current_price|floatformat:2 }}</div>
+            </div>
+            {% endif %}
+            {% if forecast.high_52w %}
+            <div class="info-item">
+                <div class="ii-label">52-Week High</div>
+                <div class="ii-value">₹{{ forecast.high_52w|floatformat:2 }}</div>
+            </div>
+            {% endif %}
+            {% if forecast.low_52w %}
+            <div class="info-item">
+                <div class="ii-label">52-Week Low</div>
+                <div class="ii-value">₹{{ forecast.low_52w|floatformat:2 }}</div>
+            </div>
+            {% endif %}
+            {% if forecast.pe_ratio %}
+            <div class="info-item">
+                <div class="ii-label">P/E Ratio</div>
+                <div class="ii-value">{{ forecast.pe_ratio|floatformat:1 }}</div>
+            </div>
+            {% endif %}
+            {% if forecast.roe %}
+            <div class="info-item">
+                <div class="ii-label">ROE</div>
+                <div class="ii-value">{{ forecast.rsi|floatformat:1 }}%</div>
+            </div>
+            {% endif %}
+            <div class="info-item">
+                <div class="ii-label">RSI (14)</div>
+                <div class="ii-value">
+                    {{ forecast.rsi|floatformat:1 }}
+                    {% if forecast.rsi > 70 %}
+                        <span style="color:#ef4444; font-size:0.75rem;">Overbought</span>
+                    {% elif forecast.rsi < 30 %}
+                        <span style="color:#10b981; font-size:0.75rem;">Oversold</span>
+                    {% else %}
+                        <span style="color:#6c757d; font-size:0.75rem;">Neutral</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="info-item">
+                <div class="ii-label">MACD</div>
+                <div class="ii-value">
+                    {% if forecast.macd_positive %}
+                        <span style="color:#10b981;">Bullish</span>
+                    {% else %}
+                        <span style="color:#ef4444;">Bearish</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="info-item">
+                <div class="ii-label">Trend vs SMA</div>
+                <div class="ii-value">
+                    {% if forecast.above_sma20 %}
+                        <span style="color:#10b981;">Above SMA20</span>
+                    {% else %}
+                        <span style="color:#ef4444;">Below SMA20</span>
+                    {% endif %}
+                    {% if forecast.above_sma50 is not None %}
+                        / {% if forecast.above_sma50 %}<span style="color:#10b981;">SMA50</span>{% else %}<span style="color:#ef4444;">SMA50</span>{% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if forecast.reasons %}
+    <div class="section-card">
+        <h3><i class="bi bi-lightbulb me-1"></i> Analysis & Reasoning</h3>
+        <ul class="reasons-list">
+            {% for reason in forecast.reasons %}
+            <li>{{ reason }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <div class="disclaimer-box">
+        <i class="bi bi-exclamation-triangle-fill me-1"></i>
+        <strong>Educational Purpose Only:</strong> This forecast is generated by an AI system for educational purposes.
+        It is NOT financial advice. Price targets are statistical projections based on historical patterns.
+        Always do your own research and consult a qualified financial advisor.
+    </div>
+</div>
+{% endblock %}

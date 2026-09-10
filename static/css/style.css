@@ -309,3 +309,311 @@ body {
         grid-template-columns: 1fr;
     }
 }
+
+/* ==================================================================
+   MONEY PLANNER
+   ================================================================== */
+
+.mp-hero {
+    background: linear-gradient(135deg, #f8faff, #e8efff);
+    border-radius: 1rem;
+    padding: 2rem;
+}
+
+.mp-hero-icon {
+    color: var(--finance-blue);
+    font-size: 4rem;
+    opacity: 0.4;
+}
+
+.mp-step-card {
+    background: #ffffff;
+    border: 2px solid #e6edff;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    text-align: center;
+    transition: all 0.2s ease;
+    height: 100%;
+}
+
+.mp-step-card:hover {
+    border-color: var(--finance-blue);
+    transform: translateY(-3px);
+    box-shadow: 0 0.5rem 1.5rem rgba(21, 94, 239, 0.12);
+}
+
+.mp-step-card.completed {
+    border-color: #0e9f6e;
+    background: #f0fdf4;
+}
+
+.mp-step-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--finance-blue);
+    margin-bottom: 0.5rem;
+}
+
+.mp-section {
+    background: #ffffff;
+    border: 1px solid #e6edff;
+    border-radius: 1rem;
+    padding: 1.5rem;
+}
+
+.mp-question-card {
+    background: #ffffff;
+    border: 1px solid #e6edff;
+    border-radius: 0.85rem;
+    padding: 1.25rem;
+}
+
+.mp-form-card {
+    background: #f8faff;
+    border: 1px solid #e6edff;
+    border-radius: 0.85rem;
+    padding: 1.25rem;
+}
+
+.mp-plan-card {
+    background: #ffffff;
+    border: 1px solid #e6edff;
+    border-radius: 1rem;
+    padding: 1.25rem;
+    transition: all 0.2s ease;
+    height: 100%;
+}
+
+.mp-plan-card:hover {
+    box-shadow: 0 0.5rem 1.5rem rgba(11, 31, 58, 0.1);
+    transform: translateY(-2px);
+}
+
+.mp-stat-card {
+    background: #f8faff;
+    border: 1px solid #e6edff;
+    border-radius: 0.75rem;
+    padding: 1rem;
+    text-align: center;
+}
+
+.mp-stat-label {
+    color: var(--finance-muted);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.mp-stat-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-top: 0.25rem;
+}
+
+.mp-goal-card {
+    background: #f8faff;
+    border: 1px solid #e6edff;
+    border-radius: 0.85rem;
+    padding: 1rem;
+    height: 100%;
+}
+
+.mp-bar {
+    height: 8px;
+    background: var(--finance-blue);
+    border-radius: 4px;
+    min-width: 8px;
+    max-width: 120px;
+}
+
+.mp-tool-card {
+    background: #ffffff;
+    border: 1px solid #e6edff;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    text-align: center;
+    transition: all 0.2s ease;
+    height: 100%;
+}
+
+.mp-tool-card:hover {
+    border-color: var(--finance-blue);
+    transform: translateY(-3px);
+    box-shadow: 0 0.5rem 1.5rem rgba(21, 94, 239, 0.12);
+}
+
+.mp-tool-icon {
+    font-size: 2.5rem;
+    color: var(--finance-blue);
+    margin-bottom: 0.75rem;
+}
+
+.mp-empty-icon {
+    font-size: 3rem;
+    color: #cbd5e1;
+}
+
+.mp-info-box {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 0.75rem;
+    padding: 1rem;
+}
+
+.form-check-input:checked {
+    background-color: var(--finance-blue);
+    border-color: var(--finance-blue);
+}
+
+.risk-radio {
+    list-style: none;
+    padding-left: 0;
+}
+
+.risk-radio li {
+    margin-bottom: 0.4rem;
+}
+
+.risk-radio input[type="radio"] {
+    margin-right: 0.5rem;
+}
+
+@media (max-width: 576px) {
+    .mp-hero {
+        padding: 1.25rem;
+    }
+
+    .mp-hero-icon {
+        display: none;
+    }
+
+    .mp-stat-value {
+        font-size: 1.1rem;
+    }
+}
+
+/* ==================================================================
+   MUTUAL FUNDS EDUCATION MODULE
+   ================================================================== */
+
+.mp-badge {
+    align-items: center;
+    border-radius: 0.75rem;
+    display: inline-flex;
+    font-size: 1.3rem;
+    height: 46px;
+    justify-content: center;
+    width: 46px;
+}
+
+.mp-fund-return {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.mp-info-row {
+    align-items: baseline;
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.35rem 0;
+}
+
+.mp-info-label {
+    color: var(--finance-muted);
+    flex-shrink: 0;
+    font-size: 0.85rem;
+    font-weight: 600;
+    min-width: 110px;
+}
+
+.mp-info-value {
+    font-size: 0.9rem;
+}
+
+.mp-checklist {
+    list-style: none;
+    padding-left: 0;
+}
+
+.mp-checklist li {
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%230e9f6e' class='bi bi-check-circle' viewBox='0 0 16 16'%3E%3Cpath d='M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z'/%3E%3Cpath d='M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z'/%3E%3C/svg%3E") left center no-repeat;
+    padding-left: 1.5rem;
+    margin-bottom: 0.4rem;
+}
+
+.mp-crosslist {
+    list-style: none;
+    padding-left: 0;
+}
+
+.mp-crosslist li {
+    color: #b91c1c;
+    padding-left: 1.2rem;
+    position: relative;
+    margin-bottom: 0.4rem;
+}
+
+.mp-crosslist li::before {
+    content: "✕";
+    left: 0;
+    position: absolute;
+}
+
+.mp-fund-grid {
+    display: grid;
+    gap: 0.6rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.mp-fund-grid > div {
+    background: #f8fafc;
+    border-radius: 0.6rem;
+    padding: 0.6rem;
+}
+
+.mp-data-label {
+    color: var(--finance-muted);
+    font-size: 0.72rem;
+    font-weight: 600;
+}
+
+.mp-minibar {
+    background: #eef1f5;
+    border-radius: 4px;
+    height: 6px;
+    min-width: 50px;
+    overflow: hidden;
+    width: 70px;
+}
+
+.mp-minibar > div {
+    border-radius: 4px;
+    height: 100%;
+}
+
+.mp-insight {
+    background: #f8faff;
+    border-left: 3px solid var(--finance-blue);
+    border-radius: 0.6rem;
+    padding: 0.85rem 1rem;
+}
+
+.mp-fund-pill {
+    background: #ffffff;
+    border: 1px solid #e6edff;
+    border-radius: 0.75rem;
+    display: inline-block;
+    text-align: center;
+    transition: transform 0.2s ease;
+}
+
+.mp-fund-pill:hover {
+    transform: translateY(-2px);
+}
+
+@media (max-width: 576px) {
+    .mp-fund-grid {
+        grid-template-columns: 1fr;
+    }
+}

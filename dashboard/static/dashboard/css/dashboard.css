@@ -74,6 +74,9 @@
     padding: 15px 17px;
     box-shadow: 0 4px 14px rgba(20,30,40,.07);
     transition: .25s ease;
+    text-decoration: none;
+    color: inherit;
+    display: block;
 }
 
 .stat-card:hover {

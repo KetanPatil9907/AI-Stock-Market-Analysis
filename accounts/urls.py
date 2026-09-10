@@ -1,13 +1,51 @@
+
 from django.urls import path
+
 from . import views
+
 
 app_name = "accounts"
 
+
 urlpatterns = [
-    path("", views.login_view, name="login"),
-    path("register/", views.register_view, name="register"),
-    path("logout/", views.logout_view, name="logout"),
-    path("profile/", views.profile_view, name="profile"),
+
+    # ==================================================
+    # EXISTING DJANGO AUTHENTICATION
+    # ==================================================
+
+    path(
+        "",
+        views.login_view,
+        name="login",
+    ),
+    path(
+    "clerk-login/",
+    views.clerk_login_view,
+    name="clerk_login",
+),
+
+    path(
+        "register/",
+        views.register_view,
+        name="register",
+    ),
+
+    path(
+        "logout/",
+        views.logout_view,
+        name="logout",
+    ),
+
+    path(
+        "profile/",
+        views.profile_view,
+        name="profile",
+    ),
+
+
+    # ==================================================
+    # PASSWORD CHANGE
+    # ==================================================
 
     path(
         "password-change/",
@@ -20,6 +58,11 @@ urlpatterns = [
         views.UserPasswordChangeDoneView.as_view(),
         name="password_change_done",
     ),
+
+
+    # ==================================================
+    # PASSWORD RESET
+    # ==================================================
 
     path(
         "password-reset/",
@@ -43,5 +86,16 @@ urlpatterns = [
         "password-reset/complete/",
         views.UserPasswordResetCompleteView.as_view(),
         name="password_reset_complete",
+    ),
+
+
+    # ==================================================
+    # CLERK LOGIN
+    # ==================================================
+
+    path(
+        "clerk-login/",
+        views.clerk_login_view,
+        name="clerk_login",
     ),
 ]

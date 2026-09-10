@@ -1,0 +1,229 @@
+{% extends "base.html" %}
+
+{% block title %}Compare Mutual Funds | Money Planner{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{% url 'investments:home' %}">Money Planner</a>
+            </li>
+            <li class="breadcrumb-item active">Compare Funds</li>
+        </ol>
+    </nav>
+
+    <!-- Header -->
+    <div class="mp-section mb-4">
+        <h2 class="fw-bold mb-2">
+            <i class="bi bi-arrow-left-right me-2"></i>Compare Mutual Funds
+        </h2>
+        <p class="text-muted mb-0">
+            Select 2–4 fund categories and we'll rank them by risk and
+            return so you can see which fits you best.
+        </p>
+    </div>
+
+    <div class="row g-4">
+
+        <!-- LEFT: Selection Form -->
+        <div class="col-lg-5">
+            <div class="mp-section">
+                <h5 class="fw-bold mb-3">
+                    <i class="bi bi-sliders me-2"></i>Select Funds
+                </h5>
+
+                <form method="post" novalidate>
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">{{ form.fund_a.label }}</label>
+                        {{ form.fund_a }}
+                        {% if form.fund_a.errors %}
+                            <div class="text-danger small">{{ form.fund_a.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">{{ form.fund_b.label }}</label>
+                        {{ form.fund_b }}
+                        {% if form.fund_b.errors %}
+                            <div class="text-danger small">{{ form.fund_b.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">{{ form.fund_c.label }}</label>
+                        {{ form.fund_c }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">{{ form.fund_d.label }}</label>
+                        {{ form.fund_d }}
+                    </div>
+
+                    <button type="submit" class="btn btn-finance w-100">
+                        <i class="bi bi-arrow-left-right me-2"></i>Compare
+                    </button>
+                </form>
+            </div>
+
+            <!-- Quick links -->
+            <div class="mp-section mt-3">
+                <h6 class="fw-bold mb-2">Quick compare</h6>
+                <div class="d-flex flex-column gap-2">
+                    <a href="{% url 'investments:mf_vs_fd' %}" class="small text-decoration-none">
+                        <i class="bi bi-shop me-1"></i>MF vs FD — why funds win
+                    </a>
+                    <a href="{% url 'investments:funds_explore' %}" class="small text-decoration-none">
+                        <i class="bi bi-collection me-1"></i>All fund types explained
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT: Comparison Results -->
+        <div class="col-lg-7">
+            {% if result and result.selected %}
+            <div class="mp-section mb-4">
+                <h4 class="fw-bold mb-3">Comparison Result</h4>
+
+                <!-- Ranked table -->
+                <div class="table-responsive mb-4">
+                    <table class="table align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Rank</th>
+                                <th>Fund</th>
+                                <th>Risk</th>
+                                <th>Expected Return</th>
+                                <th>Best Horizon</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for fund in result.ranked %}
+                            <tr>
+                                <td>
+                                    <span class="badge {% if forloop.counter < 4 %}bg-primary{% else %}bg-secondary{% endif %}">
+                                        #{{ forloop.counter }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="fw-semibold">{{ fund.name }}</span>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="mp-minibar">
+                                            <div style="width: {{ fund.risk_bar }}%; background-color: {{ fund.color }};"></div>
+                                        </div>
+                                        <span class="small">{{ fund.risk_bar }}</span>
+                                    </div>
+                                </td>
+                                <td class="fw-semibold" style="color: {{ fund.color }}">{{ fund.expected_return }}</td>
+                                <td class="small">{{ fund.best_horizon }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Recommended badges -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <div class="mp-goal-card text-center h-100">
+                            <div class="fw-bold small mb-1">
+                                <i class="bi bi-shield-check me-1"></i>Lowest Risk
+                            </div>
+                            <div class="fw-bold" style="color: #0e9f6e;">
+                                {{ result.conservative_best.name }}
+                            </div>
+                            <div class="small text-muted">
+                                Risk {{ result.conservative_best.risk_bar }}/100
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mp-goal-card text-center h-100">
+                            <div class="fw-bold small mb-1">
+                                <i class="bi bi-rocket-takeoff me-1"></i>Highest Growth
+                            </div>
+                            <div class="fw-bold" style="color: #155eef;">
+                                {{ result.aggressive_best.name }}
+                            </div>
+                            <div class="small text-muted">
+                                {{ result.aggressive_best.expected_return }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Insights -->
+                <h5 class="fw-bold mb-3">
+                    <i class="bi bi-lightbulb me-2"></i>Insights
+                </h5>
+                <div class="d-flex flex-column gap-3">
+                    {% for insight in result.insights %}
+                    <div class="mp-insight">
+                        <div class="fw-semibold mb-1">
+                            <i class="bi bi-arrow-right-circle me-1"></i>{{ insight.title }}
+                        </div>
+                        <div class="small text-muted">{{ insight.text }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="alert alert-warning disclaimer-alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                <strong>Educational only.</strong> Expected returns are
+                historical averages. Past performance is not a guarantee
+                of future results.
+            </div>
+            {% else %}
+            <div class="mp-section text-center py-5">
+                <i class="bi bi-arrow-left-right mp-empty-icon"></i>
+                <p class="text-muted mt-2 mb-4">
+                    Select at least two fund types on the left and click
+                    Compare to see which is best for your goals.
+                </p>
+
+                <!-- Default compare buttons -->
+                <div class="d-flex flex-wrap gap-2 justify-content-center">
+                    <form method="post" class="d-inline">
+                        {% csrf_token %}
+                        <input type="hidden" name="fund_a" value="LARGE_CAP">
+                        <input type="hidden" name="fund_b" value="MID_CAP">
+                        <input type="hidden" name="fund_c" value="SMALL_CAP">
+                        <button type="submit" class="btn btn-outline-primary btn-sm">
+                            Large vs Mid vs Small
+                        </button>
+                    </form>
+                    <form method="post" class="d-inline">
+                        {% csrf_token %}
+                        <input type="hidden" name="fund_a" value="FLEXI_CAP">
+                        <input type="hidden" name="fund_b" value="MULTI_CAP">
+                        <input type="hidden" name="fund_c" value="ELSS">
+                        <button type="submit" class="btn btn-outline-primary btn-sm">
+                            Flexi vs Multi vs ELSS
+                        </button>
+                    </form>
+                    <form method="post" class="d-inline">
+                        {% csrf_token %}
+                        <input type="hidden" name="fund_a" value="DEBT">
+                        <input type="hidden" name="fund_b" value="HYBRID">
+                        <input type="hidden" name="fund_c" value="INDEX">
+                        <button type="submit" class="btn btn-outline-primary btn-sm">
+                            Debt vs Hybrid vs Index
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

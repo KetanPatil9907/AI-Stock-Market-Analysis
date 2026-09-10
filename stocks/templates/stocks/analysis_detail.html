@@ -1,137 +1,599 @@
 {% extends "base.html" %}
-{% block title %}{{ symbol }} — AI Stock Analysis{% endblock %}
+{% load static %}
+
+{% block title %}AI Analysis — {{ symbol }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/analysis.css' %}">
+{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-  <a href="{% url 'stocks:search' %}" class="text-decoration-none">&larr; New search</a>
+<div class="analysis-page">
 
-  {% if error %}
-    <div class="alert alert-warning mt-4">{{ error }}</div>
-  {% else %}
+    {% if error %}
+        <div class="container py-5">
+            <div class="alert alert-danger d-flex align-items-center gap-3">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                <div>
+                    <strong>Unable to load data</strong>
+                    <p class="mb-0 small">{{ error }}</p>
+                </div>
+                <a href="{% url 'stocks:search' %}" class="btn btn-sm btn-outline-danger ms-auto">Try Again</a>
+            </div>
+        </div>
+    {% else %}
 
-  <div class="d-flex justify-content-between align-items-start mt-3 mb-4">
-    <div>
-      <h1 class="mb-0">{{ fundamentals.company_name|default:symbol }}</h1>
-      <span class="text-muted">{{ symbol }} · {{ fundamentals.sector|default:"Data unavailable" }}</span>
-    </div>
-    <div class="text-end">
-      <div class="display-6">₹{{ quote.current_price }}</div>
-      <span class="badge {% if analysis.classification == 'STRONG' or analysis.classification == 'POSITIVE' %}text-bg-success{% elif analysis.classification == 'HIGH RISK' %}text-bg-danger{% elif analysis.classification == 'CAUTION' %}text-bg-warning{% else %}text-bg-secondary{% endif %}">
-        {{ analysis.classification }}
-      </span>
-    </div>
-  </div>
+        <!-- Header -->
+        <header class="analysis-header">
+            <div class="container">
+                <a href="{% url 'stocks:search' %}" class="back-link">
+                    <i class="bi bi-arrow-left"></i> Back to Search
+                </a>
+                <div class="stock-header-row">
+                    {% if fundamentals.logoURL %}
+                        <img src="{{ fundamentals.logoURL }}" alt="{{ symbol }}" class="stock-logo"
+                             onerror="this.style.display='none'">
+                    {% endif %}
+                    <div class="stock-info">
+                        <h1>
+                            {{ symbol }}
+                            {% if quote.shortName %}<span class="text-muted ms-2 fs-6">{{ quote.shortName }}</span>{% endif %}
+                        </h1>
+                        <div class="stock-meta">
+                            {% if quote.exchange %}
+                                <span class="meta-badge">{{ quote.exchange }}</span>
+                            {% endif %}
+                            {% if fundamentals.sector %}
+                                <span class="meta-badge">{{ fundamentals.sector }}</span>
+                            {% endif %}
+                            {% if fundamentals.industry %}
+                                <span class="meta-badge">{{ fundamentals.industry }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="stock-price-block">
+                        {% if quote.currentPrice %}
+                            <div class="current-price">
+                                ₹{{ quote.currentPrice|floatformat:2 }}
+                            </div>
+                        {% endif %}
+                        {% if quote.change and quote.changePercent %}
+                            <div class="price-change {% if quote.change > 0 %}positive{% elif quote.change < 0 %}negative{% endif %}">
+                                {% if quote.change > 0 %}+{% endif %}{{ quote.change|floatformat:2 }}
+                                ({{ quote.changePercent|floatformat:2 }}%)
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </header>
 
-  {% if analysis.source == "rule_based" %}
-    <div class="alert alert-info small">
-      AI provider not configured — showing a transparent rule-based educational score instead of an AI-generated one.
-    </div>
-  {% endif %}
+        <!-- Price Chart Section -->
+        <section class="analysis-section chart-section">
+            <div class="container">
+                <div class="section-card">
+                    <div class="section-header">
+                        <h2><i class="bi bi-graph-up"></i> Price Chart</h2>
+                        <span class="chart-period-badge">1 Month</span>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="priceChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-  <!-- Scores -->
-  <div class="row g-3 mb-4">
-    <div class="col-6 col-md-3">
-      <div class="card text-center p-3">
-        <div class="text-muted small">Fundamental</div>
-        <div class="fs-3 fw-bold">{{ analysis.fundamental_score|default:"—" }}<span class="fs-6 text-muted">/100</span></div>
-      </div>
-    </div>
-    <div class="col-6 col-md-3">
-      <div class="card text-center p-3">
-        <div class="text-muted small">Technical</div>
-        <div class="fs-3 fw-bold">{{ analysis.technical_score|default:"—" }}<span class="fs-6 text-muted">/100</span></div>
-      </div>
-    </div>
-    <div class="col-6 col-md-3">
-      <div class="card text-center p-3">
-        <div class="text-muted small">Risk</div>
-        <div class="fs-3 fw-bold">{{ analysis.risk_score|default:"—" }}<span class="fs-6 text-muted">/100</span></div>
-      </div>
-    </div>
-    <div class="col-6 col-md-3">
-      <div class="card text-center p-3 border-primary">
-        <div class="text-muted small">Overall</div>
-        <div class="fs-3 fw-bold text-primary">{{ analysis.overall_score|default:"—" }}<span class="fs-6 text-muted">/100</span></div>
-      </div>
-    </div>
-  </div>
+        <!-- Technical Indicators Section -->
+        <section class="analysis-section indicators-section">
+            <div class="container">
+                <div class="section-card">
+                    <div class="section-header">
+                        <h2><i class="bi bi-speedometer2"></i> Technical Indicators</h2>
+                    </div>
 
-  <!-- Chart -->
-  <div class="card p-3 mb-4">
-    <canvas id="priceChart" height="90"></canvas>
-  </div>
+                    {% if technical_indicators.summary %}
+                    <div class="indicators-summary">
+                        {% if technical_indicators.summary.rsi %}
+                        <div class="indicator-badge {% if technical_indicators.summary.rsi > 70 %}overbought{% elif technical_indicators.summary.rsi < 30 %}oversold{% else %}neutral{% endif %}">
+                            <div class="badge-label">RSI (14)</div>
+                            <div class="badge-value">{{ technical_indicators.summary.rsi }}</div>
+                            <div class="badge-signal">{{ technical_indicators.summary.rsi_signal }}</div>
+                        </div>
+                        {% endif %}
 
-  <!-- Fundamentals table -->
-  <div class="card p-3 mb-4">
-    <h5>Fundamentals</h5>
-    <table class="table table-sm mb-0">
-      <tr><th>P/E</th><td>{{ fundamentals.pe_ratio }}</td><th>ROE</th><td>{{ fundamentals.roe }}</td></tr>
-      <tr><th>EPS</th><td>{{ fundamentals.eps }}</td><th>Debt/Equity</th><td>{{ fundamentals.debt_to_equity }}</td></tr>
-      <tr><th>Dividend Yield</th><td>{{ fundamentals.dividend_yield }}</td><th>Book Value</th><td>{{ fundamentals.book_value }}</td></tr>
-      <tr><th>Market Cap</th><td>{{ quote.market_cap }}</td><th>52W High/Low</th><td>{{ quote.fifty_two_week_high }} / {{ quote.fifty_two_week_low }}</td></tr>
-    </table>
-  </div>
+                        {% if technical_indicators.summary.macd %}
+                        <div class="indicator-badge {% if technical_indicators.summary.macd_signal == 'BULLISH' %}bullish{% else %}bearish{% endif %}">
+                            <div class="badge-label">MACD</div>
+                            <div class="badge-value">{{ technical_indicators.summary.macd|floatformat:4 }}</div>
+                            <div class="badge-signal">{{ technical_indicators.summary.macd_signal }}</div>
+                        </div>
+                        {% endif %}
 
-  <!-- AI Analysis -->
-  <div class="card p-4 mb-4">
-    <h5>AI Analysis</h5>
-    <p class="text-muted">{{ analysis.company_overview }}</p>
+                        {% if technical_indicators.summary.trend %}
+                        <div class="indicator-badge {% if technical_indicators.summary.trend == 'UPTREND' %}bullish{% else %}bearish{% endif %}">
+                            <div class="badge-label">Trend</div>
+                            <div class="badge-value">{{ technical_indicators.summary.trend }}</div>
+                            <div class="badge-signal">
+                                SMA 20: ₹{{ technical_indicators.summary.sma_20|floatformat:2 }}
+                            </div>
+                        </div>
+                        {% endif %}
 
-    <div class="row">
-      <div class="col-md-6">
-        <h6>Strengths</h6>
-        <ul>{% for s in analysis.strengths %}<li>{{ s }}</li>{% endfor %}</ul>
-        <h6>Opportunities</h6>
-        <ul>{% for o in analysis.opportunities %}<li>{{ o }}</li>{% endfor %}</ul>
-      </div>
-      <div class="col-md-6">
-        <h6>Weaknesses</h6>
-        <ul>{% for w in analysis.weaknesses %}<li>{{ w }}</li>{% endfor %}</ul>
-        <h6>Risks</h6>
-        <ul>{% for r in analysis.risks %}<li>{{ r }}</li>{% endfor %}</ul>
-      </div>
-    </div>
+                        {% if technical_indicators.summary.bb_signal %}
+                        <div class="indicator-badge {% if technical_indicators.summary.bb_signal == 'ABOVE_UPPER' %}overbought{% elif technical_indicators.summary.bb_signal == 'BELOW_LOWER' %}oversold{% else %}neutral{% endif %}">
+                            <div class="badge-label">Bollinger Band</div>
+                            <div class="badge-value">{{ technical_indicators.summary.bb_signal }}</div>
+                            <div class="badge-signal">
+                                ₹{{ technical_indicators.summary.bb_lower|floatformat:2 }} — ₹{{ technical_indicators.summary.bb_upper|floatformat:2 }}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
 
-    <h6>Conclusion</h6>
-    <p>{{ analysis.conclusion }}</p>
+                    <div class="chart-wrapper" style="height: 300px;">
+                        <canvas id="indicatorChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-    <form method="post" action="{% url 'stocks:save_analysis' symbol %}">
-      {% csrf_token %}
-      <button type="submit" class="btn btn-primary">Save Analysis</button>
-    </form>
-  </div>
+        <!-- Fundamentals Section -->
+        <section class="analysis-section fundamentals-section">
+            <div class="container">
+                <div class="section-card">
+                    <div class="section-header">
+                        <h2><i class="bi bi-building"></i> Key Fundamentals</h2>
+                    </div>
+                    <div class="fundamentals-grid">
+                        {% if fundamentals.marketCap %}
+                        <div class="fund-item">
+                            <div class="fund-label">Market Cap</div>
+                            <div class="fund-value">₹{{ fundamentals.marketCap|floatformat:0 }} Cr</div>
+                        </div>
+                        {% endif %}
+                        {% if fundamentals.peRatio %}
+                        <div class="fund-item">
+                            <div class="fund-label">P/E Ratio</div>
+                            <div class="fund-value">{{ fundamentals.peRatio|floatformat:2 }}</div>
+                        </div>
+                        {% endif %}
+                        {% if fundamentals.pbRatio %}
+                        <div class="fund-item">
+                            <div class="fund-label">P/B Ratio</div>
+                            <div class="fund-value">{{ fundamentals.pbRatio|floatformat:2 }}</div>
+                        </div>
+                        {% endif %}
+                        {% if fundamentals.dividendYield %}
+                        <div class="fund-item">
+                            <div class="fund-label">Dividend Yield</div>
+                            <div class="fund-value">{{ fundamentals.dividendYield|floatformat:2 }}%</div>
+                        </div>
+                        {% endif %}
+                        {% if fundamentals.eps %}
+                        <div class="fund-item">
+                            <div class="fund-label">EPS</div>
+                            <div class="fund-value">₹{{ fundamentals.eps|floatformat:2 }}</div>
+                        </div>
+                        {% endif %}
+                        {% if fundamentals.bookValue %}
+                        <div class="fund-item">
+                            <div class="fund-label">Book Value</div>
+                            <div class="fund-value">₹{{ fundamentals.bookValue|floatformat:2 }}</div>
+                        </div>
+                        {% endif %}
+                        {% if quote.high52w %}
+                        <div class="fund-item">
+                            <div class="fund-label">52W High</div>
+                            <div class="fund-value">₹{{ quote.high52w|floatformat:2 }}</div>
+                        </div>
+                        {% endif %}
+                        {% if quote.low52w %}
+                        <div class="fund-item">
+                            <div class="fund-label">52W Low</div>
+                            <div class="fund-value">₹{{ quote.low52w|floatformat:2 }}</div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </section>
 
-  <div class="alert alert-secondary small">
-    <strong>Disclaimer:</strong> Educational analysis only, not financial advice.
-    Past performance does not guarantee future returns.
-  </div>
+        <!-- AI Analysis Section -->
+        <section class="analysis-section ai-section">
+            <div class="container">
+                <div class="section-card">
+                    <div class="section-header">
+                        <h2><i class="bi bi-cpu"></i> AI-Powered Analysis</h2>
+                        <span class="ai-badge">Powered by {{ analysis.source|default:"AI" }}</span>
+                    </div>
 
-  {% endif %}
+                    {% if analysis.company_overview %}
+                    <div class="overview-box">
+                        <h3>Company Overview</h3>
+                        <p>{{ analysis.company_overview }}</p>
+                    </div>
+                    {% endif %}
+
+                    {% if analysis.fundamental_score or analysis.technical_score or analysis.growth_score or analysis.risk_score or analysis.overall_score %}
+                    <div class="scores-grid">
+                        {% if analysis.fundamental_score %}
+                        <div class="score-card">
+                            <div class="score-ring" style="--score: {{ analysis.fundamental_score }}%">
+                                <span class="score-num">{{ analysis.fundamental_score }}</span>
+                            </div>
+                            <div class="score-label">Fundamental</div>
+                        </div>
+                        {% endif %}
+                        {% if analysis.technical_score %}
+                        <div class="score-card">
+                            <div class="score-ring" style="--score: {{ analysis.technical_score }}%">
+                                <span class="score-num">{{ analysis.technical_score }}</span>
+                            </div>
+                            <div class="score-label">Technical</div>
+                        </div>
+                        {% endif %}
+                        {% if analysis.growth_score %}
+                        <div class="score-card">
+                            <div class="score-ring" style="--score: {{ analysis.growth_score }}%">
+                                <span class="score-num">{{ analysis.growth_score }}</span>
+                            </div>
+                            <div class="score-label">Growth</div>
+                        </div>
+                        {% endif %}
+                        {% if analysis.risk_score %}
+                        <div class="score-card">
+                            <div class="score-ring" style="--score: {{ analysis.risk_score }}%">
+                                <span class="score-num">{{ analysis.risk_score }}</span>
+                            </div>
+                            <div class="score-label">Risk</div>
+                        </div>
+                        {% endif %}
+                        {% if analysis.overall_score %}
+                        <div class="score-card overall">
+                            <div class="score-ring" style="--score: {{ analysis.overall_score }}%">
+                                <span class="score-num">{{ analysis.overall_score }}</span>
+                            </div>
+                            <div class="score-label">Overall</div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+
+                    {% if analysis.classification %}
+                    <div class="classification-box classification-{{ analysis.classification|lower }}">
+                        <span class="classification-label">{{ analysis.classification }}</span>
+                    </div>
+                    {% endif %}
+
+                    <div class="analysis-details">
+                        {% if analysis.strengths %}
+                        <div class="detail-column strengths">
+                            <h4><i class="bi bi-plus-circle"></i> Strengths</h4>
+                            <ul>
+                                {% for item in analysis.strengths %}
+                                    <li>{{ item }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+
+                        {% if analysis.weaknesses %}
+                        <div class="detail-column weaknesses">
+                            <h4><i class="bi bi-dash-circle"></i> Weaknesses</h4>
+                            <ul>
+                                {% for item in analysis.weaknesses %}
+                                    <li>{{ item }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+
+                        {% if analysis.opportunities %}
+                        <div class="detail-column opportunities">
+                            <h4><i class="bi bi-arrow-up-circle"></i> Opportunities</h4>
+                            <ul>
+                                {% for item in analysis.opportunities %}
+                                    <li>{{ item }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+
+                        {% if analysis.risks %}
+                        <div class="detail-column risks">
+                            <h4><i class="bi bi-alert-circle"></i> Risks</h4>
+                            <ul>
+                                {% for item in analysis.risks %}
+                                    <li>{{ item }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    {% if analysis.conclusion %}
+                    <div class="conclusion-box">
+                        <h4>Conclusion</h4>
+                        <p>{{ analysis.conclusion }}</p>
+                    </div>
+                    {% endif %}
+
+                    <form method="post" action="{% url 'stocks:save_analysis' symbol %}" class="save-form">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-bookmark-plus"></i> Save Analysis
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- Peer Comparison Section -->
+        {% if peer_data %}
+        <section class="analysis-section peers-section">
+            <div class="container">
+                <div class="section-card">
+                    <div class="section-header">
+                        <h2><i class="bi bi-people"></i> Peer Comparison</h2>
+                        <span class="text-muted small">Sector peers (auto-detected)</span>
+                    </div>
+                    <div class="peers-grid">
+                        {% for peer in peer_data %}
+                        <a href="{% url 'stocks:analysis_detail' peer.symbol %}" class="peer-card">
+                            <div class="peer-symbol">{{ peer.symbol }}</div>
+                            <div class="peer-name">{{ peer.name }}</div>
+                            <div class="peer-action">View Analysis <i class="bi bi-arrow-right"></i></div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </section>
+        {% endif %}
+
+        <!-- Dividend History Section -->
+        {% if dividend_data.dividends %}
+        <section class="analysis-section dividend-section">
+            <div class="container">
+                <div class="section-card">
+                    <div class="section-header">
+                        <h2><i class="bi bi-cash-stack"></i> Dividend History</h2>
+                        <div class="dividend-summary">
+                            <span class="summary-item">Total Payments: <strong>{{ dividend_data.total_dividends }}</strong></span>
+                            <span class="summary-item">Avg Dividend: <strong>₹{{ dividend_data.avg_dividend|floatformat:2 }}</strong></span>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Amount (₹)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for div in dividend_data.dividends %}
+                                <tr>
+                                    <td>{{ div.date }}</td>
+                                    <td class="amount">₹{{ div.amount|floatformat:2 }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+        {% endif %}
+
+        <!-- Insider Trading Section -->
+        {% if insider_data.transactions %}
+        <section class="analysis-section insider-section">
+            <div class="container">
+                <div class="section-card">
+                    <div class="section-header">
+                        <h2><i class="bi bi-person-badge"></i> Insider Activity</h2>
+                        {% if insider_data.summary.sentiment %}
+                        <span class="insider-sentiment {{ insider_data.summary.sentiment|lower }}">
+                            {{ insider_data.summary.sentiment_note }}
+                        </span>
+                        {% endif %}
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Insider</th>
+                                    <th>Position</th>
+                                    <th>Action</th>
+                                    <th>Shares</th>
+                                    <th>Value (₹)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for tx in insider_data.transactions %}
+                                <tr>
+                                    <td>{{ tx.date }}</td>
+                                    <td>{{ tx.insider }}</td>
+                                    <td>{{ tx.position }}</td>
+                                    <td>
+                                        <span class="action-badge action-{{ tx.action|lower }}">{{ tx.action }}</span>
+                                    </td>
+                                    <td>{% if tx.shares %}{{ tx.shares }}{% else %}—{% endif %}</td>
+                                    <td>{% if tx.value %}₹{{ tx.value|floatformat:0 }}{% else %}—{% endif %}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+        {% endif %}
+
+        <!-- Disclaimer -->
+        <section class="analysis-section disclaimer-section">
+            <div class="container">
+                <div class="disclaimer-box">
+                    <i class="bi bi-info-circle"></i>
+                    <p><strong>Educational Purpose Only:</strong> This analysis is generated by an AI system for educational purposes only. It is NOT financial advice. Do not make investment decisions based solely on this analysis. Always consult a qualified financial advisor.</p>
+                </div>
+            </div>
+        </section>
+
+    {% endif %}
 </div>
 
-{% if not error %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script>
-  const histData = {{ historical_json|safe }};
-  const ctx = document.getElementById('priceChart');
-  new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: histData.labels,
-      datasets: [{
-        label: '{{ symbol }} Price (₹)',
-        data: histData.prices,
-        borderWidth: 2,
-        tension: 0.25,
-        pointRadius: 0,
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: { legend: { display: true } },
-      scales: { y: { beginAtZero: false } }
+(function() {
+    const historical = {{ historical_json|safe }};
+
+    // Price Chart
+    if (historical.labels && historical.labels.length) {
+        const priceCtx = document.getElementById('priceChart');
+        if (priceCtx) {
+            const gradient = priceCtx.getContext('2d').createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, 'rgba(16, 64, 74, 0.25)');
+            gradient.addColorStop(1, 'rgba(16, 64, 74, 0.02)');
+
+            new Chart(priceCtx, {
+                type: 'line',
+                data: {
+                    labels: historical.labels,
+                    datasets: [{
+                        label: '{{ symbol }} Price (₹)',
+                        data: historical.prices,
+                        borderColor: '#10404a',
+                        backgroundColor: gradient,
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: historical.labels.length > 30 ? 0 : 3,
+                        pointHoverRadius: 6,
+                        borderWidth: 2,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            callbacks: {
+                                label: function(ctx) {
+                                    return '₹' + ctx.parsed.y.toFixed(2);
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: {
+                                maxTicksLimit: 10,
+                                font: { size: 11 },
+                                color: '#6c757d'
+                            }
+                        },
+                        y: {
+                            grid: { color: 'rgba(0,0,0,0.05)' },
+                            ticks: {
+                                font: { size: 11 },
+                                color: '#6c757d',
+                                callback: function(v) { return '₹' + v.toFixed(0); }
+                            }
+                        }
+                    },
+                    interaction: {
+                        mode: 'nearest',
+                        axis: 'x',
+                        intersect: false
+                    }
+                }
+            });
+        }
     }
-  });
+
+    // Indicator Chart (RSI + MACD)
+    const indicators = {{ technical_indicators_json|safe }};
+    if (indicators && indicators.rsi_14 && indicators.rsi_14.length) {
+        const indicatorCtx = document.getElementById('indicatorChart');
+        if (indicatorCtx) {
+            new Chart(indicatorCtx, {
+                type: 'line',
+                data: {
+                    labels: historical.labels,
+                    datasets: [
+                        {
+                            label: 'RSI (14)',
+                            data: indicators.rsi_14,
+                            borderColor: '#6366f1',
+                            backgroundColor: 'rgba(99, 102, 241, 0.08)',
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 0,
+                            borderWidth: 2,
+                            yAxisID: 'y',
+                        },
+                        {
+                            label: 'MACD Line',
+                            data: indicators.macd ? indicators.macd.macd_line : [],
+                            borderColor: '#10b981',
+                            tension: 0.4,
+                            pointRadius: 0,
+                            borderWidth: 1.5,
+                            borderDash: [4, 2],
+                            yAxisID: 'y1',
+                        },
+                        {
+                            label: 'Signal Line',
+                            data: indicators.macd ? indicators.macd.signal_line : [],
+                            borderColor: '#f59e0b',
+                            tension: 0.4,
+                            pointRadius: 0,
+                            borderWidth: 1.5,
+                            borderDash: [4, 2],
+                            yAxisID: 'y1',
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: { font: { size: 11 }, usePointStyle: true, pointStyle: 'line' }
+                        },
+                        tooltip: { mode: 'index', intersect: false }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { maxTicksLimit: 10, font: { size: 10 }, color: '#6c757d' }
+                        },
+                        y: {
+                            position: 'left',
+                            title: { display: true, text: 'RSI', font: { size: 11 } },
+                            min: 0, max: 100,
+                            grid: { color: 'rgba(0,0,0,0.05)' },
+                            ticks: { font: { size: 10 } }
+                        },
+                        y1: {
+                            position: 'right',
+                            title: { display: true, text: 'MACD', font: { size: 11 } },
+                            grid: { drawOnChartArea: false },
+                            ticks: { font: { size: 10 } }
+                        }
+                    }
+                }
+            });
+        }
+    }
+})();
 </script>
-{% endif %}
 {% endblock %}

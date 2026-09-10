@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ symbol }} - Sentiment Analysis{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2><i class="bi bi-emoji-smile"></i> Sentiment Analysis: {{ symbol }}</h2>
+        </div>
+    </div>
+
+    <!-- Overall Sentiment -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card border-{% if sentiment.overall_score > 0 %}success{% elif sentiment.overall_score < 0 %}danger{% else %}secondary{% endif %}">
+                <div class="card-body text-center">
+                    <h5>Overall Sentiment</h5>
+                    <h2 class="{% if sentiment.overall_score > 0 %}text-success{% elif sentiment.overall_score < 0 %}text-danger{% else %}text-muted{% endif %}">
+                        {{ sentiment.overall_label }}
+                    </h2>
+                    <div class="progress mt-3" style="height: 30px;">
+                        <div class="progress-bar bg-{% if sentiment.overall_score > 0 %}success{% elif sentiment.overall_score < 0 %}danger{% else %}secondary{% endif %}"
+                             style="width: {{ sentiment.overall_score|add:"100" }}%">
+                            Score: {{ sentiment.overall_score }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5>Market Data Analysis</h5>
+                    <table class="table table-sm">
+                        <tr>
+                            <td>Price Change</td>
+                            <td class="{% if sentiment.market_data.price_change_pct > 0 %}text-success{% elif sentiment.market_data.price_change_pct < 0 %}text-danger{% endif %}">
+                                {{ sentiment.market_data.price_change_pct }}%
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Volume Ratio</td>
+                            <td>{{ sentiment.market_data.volume_ratio }}x average</td>
+                        </tr>
+                        <tr>
+                            <td>Source</td>
+                            <td>{{ sentiment.market_data.source }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Analyst Data -->
+    {% if sentiment.analyst.recommendation %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Analyst Recommendations</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-3">
+                            <h6>Recommendation</h6>
+                            <h4>{{ sentiment.analyst.recommendation }}</h4>
+                        </div>
+                        <div class="col-md-3">
+                            <h6>Target Mean</h6>
+                            <h4>Rs. {{ sentiment.analyst.target_mean }}</h4>
+                        </div>
+                        <div class="col-md-3">
+                            <h6>Target Range</h6>
+                            <h4>Rs. {{ sentiment.analyst.target_low }} - {{ sentiment.analyst.target_high }}</h4>
+                        </div>
+                        <div class="col-md-3">
+                            <h6>Upside</h6>
+                            <h4 class="{% if sentiment.analyst.upside_pct > 0 %}text-success{% else %}text-danger{% endif %}">
+                                {{ sentiment.analyst.upside_pct }}%
+                            </h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="text-center">
+        <a href="{% url 'predictions:stock_detail' symbol %}" class="btn btn-primary">
+            <i class="bi bi-arrow-left"></i> Back to Stock Detail
+        </a>
+    </div>
+</div>
+{% endblock %}

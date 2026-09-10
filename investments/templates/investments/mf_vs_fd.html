@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+
+{% block title %}Mutual Funds vs FD | Money Planner{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{% url 'investments:home' %}">Money Planner</a>
+            </li>
+            <li class="breadcrumb-item active">Mutual Funds vs FD</li>
+        </ol>
+    </nav>
+
+    <!-- Header -->
+    <div class="mp-section mb-4">
+        <h2 class="fw-bold mb-2">
+            <i class="bi bi-shop me-2"></i>Mutual Funds vs Fixed Deposits
+        </h2>
+        <p class="text-muted mb-0">
+            Both are popular Indian investment options — but they serve very
+            different purposes. Here's an honest comparison.
+        </p>
+    </div>
+
+    <div class="alert alert-warning disclaimer-alert mb-4">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        <strong>Educational only:</strong> Returns shown are historical
+        averages for illustration. Mutual fund returns are market-linked
+        and never guaranteed.
+    </div>
+
+    <!-- Head-to-head cards -->
+    <div class="row g-4 mb-4">
+
+        <!-- FD Card -->
+        <div class="col-md-6">
+            <div class="mp-section h-100">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <div class="mp-badge" style="background-color: {{ fd.color }}28; color: {{ fd.color }}">
+                        <i class="bi bi-bank"></i>
+                    </div>
+                    <h4 class="fw-bold mb-0">{{ fd.name }}</h4>
+                </div>
+
+                <div class="mb-3">
+                    <div class="fw-semibold">Return</div>
+                    <div class="mp-fund-return">{{ fd.return_pct }} p.a.</div>
+                </div>
+
+                <div class="mb-3">
+                    <span class="badge bg-success">{{ fd.risk }} Risk</span>
+                </div>
+
+                <div class="mp-info-row">
+                    <div class="mp-info-label">Tax:</div>
+                    <div class="mp-info-value">{{ fd.tax }}</div>
+                </div>
+                <div class="mp-info-row">
+                    <div class="mp-info-label">Liquidity:</div>
+                    <div class="mp-info-value">{{ fd.liquidity }}</div>
+                </div>
+                <div class="mp-info-row">
+                    <div class="mp-info-label">Best for:</div>
+                    <div class="mp-info-value">{{ fd.horizon }}</div>
+                </div>
+                <div class="mp-info-row">
+                    <div class="mp-info-label">Inflation:</div>
+                    <div class="mp-info-value">{{ fd.inflation_fighting }}</div>
+                </div>
+
+                <h6 class="fw-bold mt-4 mb-2">
+                    <i class="bi bi-check2-circle me-1"></i>Highlights
+                </h6>
+                <ul class="mp-checklist">
+                    {% for item in fd.highlights %}
+                    <li>{{ item }}</li>
+                    {% endfor %}
+                </ul>
+
+                <h6 class="fw-bold mt-4 mb-2">
+                    <i class="bi bi-x-circle me-1"></i>Limitations
+                </h6>
+                <ul class="mp-crosslist">
+                    {% for item in fd.limitations %}
+                    <li>{{ item }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <!-- MF Card -->
+        <div class="col-md-6">
+            <div class="mp-section h-100" style="border: 2px solid #155eef;">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <div class="mp-badge" style="background-color: #155eef28; color: #155eef">
+                        <i class="bi bi-graph-up"></i>
+                    </div>
+                    <h4 class="fw-bold mb-0">{{ mf.name }}</h4>
+                    <span class="badge bg-primary ms-auto">Winner for growth</span>
+                </div>
+
+                <div class="mb-3">
+                    <div class="fw-semibold">Return</div>
+                    <div class="mp-fund-return text-primary">{{ mf.return_pct }} p.a.</div>
+                </div>
+
+                <div class="mb-3">
+                    <span class="badge bg-warning text-dark">{{ mf.risk_label }}</span>
+                </div>
+
+                <div class="mp-info-row">
+                    <div class="mp-info-label">Tax:</div>
+                    <div class="mp-info-value">{{ mf.tax }}</div>
+                </div>
+                <div class="mp-info-row">
+                    <div class="mp-info-label">Liquidity:</div>
+                    <div class="mp-info-value">{{ mf.liquidity }}</div>
+                </div>
+                <div class="mp-info-row">
+                    <div class="mp-info-label">Best for:</div>
+                    <div class="mp-info-value">{{ mf.horizon }}</div>
+                </div>
+                <div class="mp-info-row">
+                    <div class="mp-info-label">Inflation:</div>
+                    <div class="mp-info-value">{{ mf.inflation_fighting }}</div>
+                </div>
+
+                <h6 class="fw-bold mt-4 mb-2">
+                    <i class="bi bi-check2-circle me-1"></i>Highlights
+                </h6>
+                <ul class="mp-checklist">
+                    {% for item in mf.highlights %}
+                    <li>{{ item }}</li>
+                    {% endfor %}
+                </ul>
+
+                <h6 class="fw-bold mt-4 mb-2">
+                    <i class="bi bi-x-circle me-1"></i>Limitations
+                </h6>
+                <ul class="mp-crosslist">
+                    {% for item in mf.limitations %}
+                    <li>{{ item }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Real number comparison -->
+    <div class="mp-section mb-4">
+        <h4 class="fw-bold mb-3">
+            <i class="bi bi-calculator me-2"></i>The Numbers Tell the Story
+        </h4>
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Scenario</th>
+                        <th style="min-width:180px">FD (6.5% p.a.)</th>
+                        <th style="min-width:180px">Equity MF (12% p.a.)</th>
+                        <th>Takeaway</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for point in points %}
+                    <tr>
+                        <td class="fw-semibold">{{ point.title }}</td>
+                        <td class="text-success">{{ point.fd_column }}</td>
+                        <td class="text-primary fw-semibold">{{ point.mf_column }}</td>
+                        <td class="small">{{ point.note }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Takeaway -->
+    <div class="mp-section mb-4">
+        <h4 class="fw-bold mb-2">
+            <i class="bi bi-lightbulb me-2"></i>So Which is Better?
+        </h4>
+        <p class="mb-0">{{ compare.takeaway }}</p>
+    </div>
+
+    <!-- Buttons -->
+    <div class="d-flex flex-wrap gap-2 mb-4">
+        <a href="{% url 'investments:funds_explore' %}" class="btn btn-finance">
+            <i class="bi bi-collection me-2"></i>Explore Fund Types
+        </a>
+        <a href="{% url 'investments:funds_compare' %}" class="btn btn-outline-primary">
+            <i class="bi bi-arrow-left-right me-2"></i>Compare Funds
+        </a>
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,242 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Prediction Results{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="mb-1">
+                                <i class="bi bi-graph-up"></i> Your Investment Recommendations
+                            </h3>
+                            <p class="mb-0">
+                                Rs. {{ prediction_request.investment_amount|floatformat:0 }} |
+                                {{ prediction_request.get_risk_level_display }} |
+                                {{ prediction_request.get_market_display }} |
+                                {{ prediction_request.investment_horizon }} months
+                            </p>
+                        </div>
+                        <a href="{% url 'predictions:prediction_form' %}" class="btn btn-light">
+                            <i class="bi bi-arrow-repeat"></i> New Prediction
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card border-success">
+                <div class="card-body text-center">
+                    <h6 class="text-success">Strong Buy</h6>
+                    <h2>{{ strong_buys.count }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-primary">
+                <div class="card-body text-center">
+                    <h6 class="text-primary">Buy</h6>
+                    <h2>{{ buys.count }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-warning">
+                <div class="card-body text-center">
+                    <h6 class="text-warning">Hold</h6>
+                    <h2>{{ holds.count }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-danger">
+                <div class="card-body text-center">
+                    <h6 class="text-danger">Sell</h6>
+                    <h2>{{ sells.count }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Recommendations ({{ results.count }})</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Symbol</th>
+                                    <th>Name</th>
+                                    <th>Type</th>
+                                    <th>Current Price</th>
+                                    <th>Predicted (1Y)</th>
+                                    <th>Expected Return</th>
+                                    <th>Signal</th>
+                                    <th>Confidence</th>
+                                    <th>Sentiment</th>
+                                    <th>Risk</th>
+                                    <th>Suggested Amount</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for result in results %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ result.symbol }}</strong>
+                                    </td>
+                                    <td>{{ result.company_name|truncatechars:25 }}</td>
+                                    <td>
+                                        <span class="badge bg-{% if result.asset_type == 'EQ' %}primary{% elif result.asset_type == 'MF' %}success{% else %}info{% endif %}">
+                                            {{ result.asset_type }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if result.current_price %}
+                                            Rs. {{ result.current_price|floatformat:2 }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if result.predicted_price_1y %}
+                                            Rs. {{ result.predicted_price_1y|floatformat:2 }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="{% if result.expected_return_pct > 0 %}text-success{% elif result.expected_return_pct < 0 %}text-danger{% endif %}">
+                                            {{ result.expected_return_pct|floatformat:1 }}%
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if result.signal == 'STRONG_BUY' %}
+                                            <span class="badge bg-success"><i class="bi bi-arrow-up-circle"></i> Strong Buy</span>
+                                        {% elif result.signal == 'BUY' %}
+                                            <span class="badge bg-primary"><i class="bi bi-arrow-up"></i> Buy</span>
+                                        {% elif result.signal == 'HOLD' %}
+                                            <span class="badge bg-warning text-dark"><i class="bi bi-dash-circle"></i> Hold</span>
+                                        {% elif result.signal == 'SELL' %}
+                                            <span class="badge bg-danger"><i class="bi bi-arrow-down"></i> Sell</span>
+                                        {% else %}
+                                            <span class="badge bg-dark"><i class="bi bi-arrow-down-circle"></i> Strong Sell</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="progress" style="height: 20px; width: 80px;">
+                                            <div class="progress-bar bg-{% if result.confidence_score > 70 %}success{% elif result.confidence_score > 50 %}warning{% else %}danger{% endif %}"
+                                                 style="width: {{ result.confidence_score }}%">
+                                                {{ result.confidence_score|floatformat:0 }}%
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {% if result.sentiment_score > 30 %}
+                                            <span class="text-success"><i class="bi bi-emoji-smile"></i> {{ result.sentiment_score }}</span>
+                                        {% elif result.sentiment_score < -30 %}
+                                            <span class="text-danger"><i class="bi bi-emoji-frown"></i> {{ result.sentiment_score }}</span>
+                                        {% else %}
+                                            <span class="text-muted"><i class="bi bi-emoji-neutral"></i> {{ result.sentiment_score }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-{% if result.risk_rating == 'LOW' %}success{% elif result.risk_rating == 'MODERATE' %}warning{% elif result.risk_rating == 'HIGH' %}danger{% else %}secondary{% endif %}">
+                                            {{ result.risk_rating }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <strong>Rs. {{ result.suggested_amount|floatformat:0 }}</strong>
+                                    </td>
+                                    <td>
+                                        {% if result.asset_type == 'EQ' %}
+                                            <a href="{% url 'predictions:stock_detail' result.symbol %}" class="btn btn-sm btn-outline-primary">
+                                                <i class="bi bi-info-circle"></i>
+                                            </a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detailed Cards -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <h4><i class="bi bi-list-check"></i> Detailed Analysis</h4>
+        </div>
+        {% for result in results %}
+        <div class="col-md-6 col-lg-4 mb-3">
+            <div class="card h-100 border-{% if result.signal == 'STRONG_BUY' %}success{% elif result.signal == 'BUY' %}primary{% elif result.signal == 'HOLD' %}warning{% else %}danger{% endif %}">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <strong>{{ result.symbol }}</strong>
+                    <span class="badge bg-{% if result.signal == 'STRONG_BUY' %}success{% elif result.signal == 'BUY' %}primary{% elif result.signal == 'HOLD' %}warning{% else %}danger{% endif %}">
+                        {{ result.get_signal_display }}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted small mb-2">{{ result.company_name }}</p>
+                    <div class="row text-center mb-3">
+                        <div class="col-4">
+                            <small class="text-muted">Current</small>
+                            <br>
+                            <strong>Rs. {{ result.current_price|floatformat:0 }}</strong>
+                        </div>
+                        <div class="col-4">
+                            <small class="text-muted">1Y Target</small>
+                            <br>
+                            <strong class="text-{% if result.expected_return_pct > 0 %}success{% else %}danger{% endif %}">
+                                Rs. {{ result.predicted_price_1y|floatformat:0 }}
+                            </strong>
+                        </div>
+                        <div class="col-4">
+                            <small class="text-muted">Return</small>
+                            <br>
+                            <strong class="text-{% if result.expected_return_pct > 0 %}success{% else %}danger{% endif %}">
+                                {{ result.expected_return_pct|floatformat:1 }}%
+                            </strong>
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <small class="text-muted">Investment:</small>
+                        <strong>Rs. {{ result.suggested_amount|floatformat:0 }}</strong>
+                    </div>
+                    <p class="small text-muted mb-0">{{ result.reasoning }}</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Disclaimer -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="alert alert-warning">
+                <i class="bi bi-exclamation-triangle"></i>
+                <strong>Disclaimer:</strong> These predictions are based on technical analysis and market sentiment.
+                They are for educational purposes only and should not be considered as financial advice.
+                Please consult a qualified financial advisor before making investment decisions.
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

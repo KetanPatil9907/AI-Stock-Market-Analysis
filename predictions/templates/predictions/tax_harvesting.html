@@ -1,0 +1,251 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Tax Harvesting Tool{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2><i class="bi bi-calculator"></i> Tax Harvesting Tool</h2>
+            <p class="text-muted">Optimize your taxes by strategically booking losses (LTCG/STCG)</p>
+        </div>
+    </div>
+
+    <!-- Tax Summary -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card border-primary">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">Total Invested</h6>
+                    <h4>Rs. {{ tax_report.total_invested|floatformat:0 }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-success">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">Total Gains</h6>
+                    <h4 class="text-success">Rs. {{ tax_report.total_gain|floatformat:0 }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-danger">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">Total Losses</h6>
+                    <h4 class="text-danger">Rs. {{ tax_report.total_loss|floatformat:0 }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-warning">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">Est. Tax</h6>
+                    <h4 class="text-warning">Rs. {{ tax_report.total_tax_estimate|floatformat:0 }}</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Capital Gains Breakdown -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Short Term Capital Gains (STCG)</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>STCG Gains:</span>
+                        <strong class="text-success">Rs. {{ tax_report.stcg_gain|floatformat:0 }}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>STCG Losses:</span>
+                        <strong class="text-danger">Rs. {{ tax_report.stcg_loss|floatformat:0 }}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Tax Rate:</span>
+                        <strong>20%</strong>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>Estimated Tax:</span>
+                        <strong class="text-warning">Rs. {{ tax_report.stcg_tax_estimate|floatformat:0 }}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Long Term Capital Gains (LTCG)</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>LTCG Gains:</span>
+                        <strong class="text-success">Rs. {{ tax_report.ltcg_gain|floatformat:0 }}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>LTCG Losses:</span>
+                        <strong class="text-danger">Rs. {{ tax_report.ltcg_loss|floatformat:0 }}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Tax Rate:</span>
+                        <strong>10% (above Rs. 1L exemption)</strong>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>Estimated Tax:</span>
+                        <strong class="text-warning">Rs. {{ tax_report.ltcg_tax_estimate|floatformat:0 }}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tax Harvesting Opportunities -->
+    {% if harvest_analysis.opportunities %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-warning">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">
+                        <i class="bi bi-lightbulb"></i> Tax Harvesting Opportunities
+                        <span class="badge bg-dark">Potential Savings: Rs. {{ harvest_analysis.total_potential_savings }}</span>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Consider selling these holdings at a loss to offset your gains:</p>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Symbol</th>
+                                    <th>Buy Price</th>
+                                    <th>Current</th>
+                                    <th>Qty</th>
+                                    <th>Loss</th>
+                                    <th>Tax Type</th>
+                                    <th>Tax Saved</th>
+                                    <th>Recommendation</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for opp in harvest_analysis.opportunities %}
+                                <tr>
+                                    <td><strong>{{ opp.symbol }}</strong></td>
+                                    <td>Rs. {{ opp.buy_price }}</td>
+                                    <td>Rs. {{ opp.current_price }}</td>
+                                    <td>{{ opp.quantity }}</td>
+                                    <td class="text-danger">-Rs. {{ opp.loss_amount|floatformat:0 }}</td>
+                                    <td><span class="badge bg-info">{{ opp.tax_type }}</span></td>
+                                    <td class="text-success">+Rs. {{ opp.potential_tax_saved }}</td>
+                                    <td><small>{{ opp.recommendation }}</small></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Add Tax Record -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="bi bi-plus-circle"></i> Add Tax Record</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{% url 'predictions:add_tax_record' %}">
+                        {% csrf_token %}
+                        {% for field in form %}
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}
+                                <div class="text-danger small">{{ field.errors }}</div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                        <button type="submit" class="btn btn-info text-white w-100">
+                            <i class="bi bi-plus-lg"></i> Add Record
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tax Records -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-file-earmark-text"></i> Tax Records</h5>
+                </div>
+                <div class="card-body p-0">
+                    {% if tax_records %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Symbol</th>
+                                    <th>Type</th>
+                                    <th>Gain/Loss</th>
+                                    <th>Tax</th>
+                                    <th>Saved</th>
+                                    <th>Date</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for record in tax_records %}
+                                <tr>
+                                    <td><strong>{{ record.symbol }}</strong></td>
+                                    <td><span class="badge bg-info">{{ record.tax_type }}</span></td>
+                                    <td class="{% if record.gain_loss >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                        Rs. {{ record.gain_loss|floatformat:0 }}
+                                    </td>
+                                    <td>Rs. {{ record.tax_amount|floatformat:0 }}</td>
+                                    <td class="text-success">Rs. {{ record.tax_saved|floatformat:0 }}</td>
+                                    <td>{{ record.sell_date }}</td>
+                                    <td>
+                                        <form method="post" action="{% url 'predictions:delete_tax_record' record.pk %}" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete?')">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <p class="text-muted">No tax records yet.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tax Rules Info -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="alert alert-info">
+                <h6><i class="bi bi-info-circle"></i> Indian Capital Gains Tax Rules (FY 2024-25)</h6>
+                <ul class="mb-0">
+                    <li><strong>STCG (Equity):</strong> 20% on gains from stocks sold within 1 year</li>
+                    <li><strong>LTCG (Equity):</strong> 10% on gains above Rs. 1,00,000 per year (holding > 1 year)</li>
+                    <li><strong>Tax Harvesting:</strong> Book losses to offset gains and reduce tax liability</li>
+                    <li><strong>Wash Sale Rule:</strong> You can buy back after 30 days to avoid disallowed loss</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

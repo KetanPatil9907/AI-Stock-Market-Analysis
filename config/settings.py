@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     "ipo",
     "investments",
     "education",
+    "predictions",
 ]
 
 MIDDLEWARE = [
@@ -128,3 +129,8 @@ AUTHENTICATION_BACKENDS = [
     "accounts.backends.EmailBackend",
     "django.contrib.auth.backends.ModelBackend",
 ]
+
+CLERK_PUBLISHABLE_KEY = os.getenv(
+    "CLERK_PUBLISHABLE_KEY",
+    "",
+)

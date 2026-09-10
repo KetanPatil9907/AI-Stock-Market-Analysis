@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% load investment_tags %}
+
+{% block title %}Risk Assessment | Money Planner{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{% url 'investments:home' %}">Money Planner</a>
+            </li>
+            <li class="breadcrumb-item active">Risk Assessment</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+
+            <div class="mp-section mb-4">
+                <h2 class="fw-bold mb-2">
+                    <i class="bi bi-shield-check me-2"></i>Risk Assessment
+                </h2>
+                <p class="text-muted">
+                    Answer these 8 questions to help us understand your
+                    risk tolerance. This is purely educational and does
+                    not store personal financial data.
+                </p>
+            </div>
+
+            <form method="post" novalidate>
+                {% csrf_token %}
+
+                {% for q in questions %}
+                <div class="mp-question-card mb-3">
+                    <h5 class="mb-3">
+                        <span class="badge bg-primary me-2">{{ forloop.counter }}</span>
+                        {{ q.question }}
+                    </h5>
+
+                    <div class="ms-4">
+                        {% for opt in q.options %}
+                        <div class="form-check mb-2">
+                            <input
+                                class="form-check-input"
+                                type="radio"
+                                name="{{ q.id }}"
+                                id="{{ q.id }}_{{ forloop.counter0 }}"
+                                value="{{ forloop.counter0 }}"
+                                {% if selected_answers|get:q.id == forloop.counter0 %}checked{% endif %}
+                                required
+                            >
+                            <label class="form-check-label" for="{{ q.id }}_{{ forloop.counter0 }}">
+                                {{ opt.label }}
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    {% if form.errors and q.id in form.errors %}
+                    <div class="text-danger small mt-1">
+                        Please select an option.
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-finance btn-lg px-5">
+                        <i class="bi bi-check2-circle me-2"></i>Submit Assessment
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}Lump Sum Calculator | Money Planner{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{% url 'investments:home' %}">Money Planner</a>
+            </li>
+            <li class="breadcrumb-item active">Lump Sum Calculator</li>
+        </ol>
+    </nav>
+
+    <div class="row g-4">
+
+        <!-- LEFT: Form -->
+        <div class="col-lg-5">
+            <div class="mp-section">
+                <h3 class="fw-bold mb-2">
+                    <i class="bi bi-cash-stack me-2"></i>Lump Sum Calculator
+                </h3>
+                <p class="text-muted mb-4">
+                    See how a one-time investment grows over time with
+                    compound annual returns.
+                </p>
+
+                <form method="post" novalidate>
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label for="{{ form.principal.id_for_label }}" class="form-label fw-semibold">
+                            Lump Sum Amount (₹)
+                        </label>
+                        {{ form.principal }}
+                        {% if form.principal.errors %}
+                            <div class="text-danger small">{{ form.principal.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.annual_return.id_for_label }}" class="form-label fw-semibold">
+                            Expected Annual Return (%)
+                        </label>
+                        {{ form.annual_return }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.years.id_for_label }}" class="form-label fw-semibold">
+                            Investment Duration (Years)
+                        </label>
+                        {{ form.years }}
+                    </div>
+
+                    <button type="submit" class="btn btn-finance w-100">
+                        <i class="bi bi-calculator me-2"></i>Calculate
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- RIGHT: Results -->
+        <div class="col-lg-7">
+            {% if result %}
+            <div class="mp-section">
+                <h4 class="fw-bold mb-3">Result</h4>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <div class="mp-stat-card">
+                            <div class="mp-stat-label">Amount Invested</div>
+                            <div class="mp-stat-value">
+                                ₹{{ result.principal|floatformat:0 }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mp-stat-card">
+                            <div class="mp-stat-label">Wealth Gained</div>
+                            <div class="mp-stat-value text-success">
+                                ₹{{ result.total_returns|floatformat:0 }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mp-stat-card">
+                            <div class="mp-stat-label">Future Value</div>
+                            <div class="mp-stat-value text-primary">
+                                ₹{{ result.future_value|floatformat:0 }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mp-info-box">
+                    <p class="mb-1">
+                        <strong>Investment:</strong>
+                        ₹{{ result.principal|floatformat:0 }} for {{ result.years }} years
+                        at {{ result.annual_return }}% p.a.
+                    </p>
+                    <p class="mb-0">
+                        <strong>Result:</strong>
+                        Your ₹{{ result.principal|floatformat:0 }} investment grows to
+                        <strong>₹{{ result.future_value|floatformat:0 }}</strong>,
+                        earning ₹{{ result.total_returns|floatformat:0 }} in returns.
+                    </p>
+                </div>
+            </div>
+            {% else %}
+            <div class="mp-section text-center py-5">
+                <i class="bi bi-cash-stack mp-empty-icon"></i>
+                <p class="text-muted mt-2">
+                    Enter your investment details and click Calculate to
+                    see projections.
+                </p>
+            </div>
+            {% endif %}
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

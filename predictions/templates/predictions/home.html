@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Stock Predictions & Recommendations{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="mb-3">
+                <i class="bi bi-graph-up-arrow"></i> Stock Predictions & Recommendations
+            </h2>
+            <p class="text-muted">
+                AI-powered stock predictions, portfolio tracking, and tax harvesting tools.
+            </p>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card border-primary h-100">
+                <div class="card-body text-center">
+                    <h6 class="card-title text-primary">Total Invested</h6>
+                    <h3 class="text-primary">Rs. {{ total_invested|floatformat:0 }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-success h-100">
+                <div class="card-body text-center">
+                    <h6 class="card-title text-success">Current Value</h6>
+                    <h3 class="text-success">Rs. {{ total_current|floatformat:0 }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-{% if total_pnl >= 0 %}success{% else %}danger{% endif %} h-100">
+                <div class="card-body text-center">
+                    <h6 class="card-title text-{% if total_pnl >= 0 %}success{% else %}danger{% endif %}">
+                        Total P&L
+                    </h6>
+                    <h3 class="text-{% if total_pnl >= 0 %}success{% else %}danger{% endif %}">
+                        Rs. {{ total_pnl|floatformat:0 }}
+                    </h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-info h-100">
+                <div class="card-body text-center">
+                    <h6 class="card-title text-info">Holdings</h6>
+                    <h3 class="text-info">{{ holdings_count }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <a href="{% url 'predictions:prediction_form' %}" class="card text-decoration-none border-primary">
+                <div class="card-body text-center">
+                    <i class="bi bi-robot display-4 text-primary"></i>
+                    <h5 class="card-title mt-3">Get Recommendations</h5>
+                    <p class="card-text text-muted">Enter your budget and risk level to get personalized stock & MF recommendations</p>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4">
+            <a href="{% url 'predictions:portfolio' %}" class="card text-decoration-none border-success">
+                <div class="card-body text-center">
+                    <i class="bi bi-wallet2 display-4 text-success"></i>
+                    <h5 class="card-title mt-3">Portfolio Tracker</h5>
+                    <p class="card-text text-muted">Track your investments and monitor P&L in real-time</p>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4">
+            <a href="{% url 'predictions:tax_harvesting' %}" class="card text-decoration-none border-warning">
+                <div class="card-body text-center">
+                    <i class="bi bi-calculator display-4 text-warning"></i>
+                    <h5 class="card-title mt-3">Tax Harvesting</h5>
+                    <p class="card-text text-muted">Optimize your taxes with smart loss harvesting strategies</p>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Top Stock Picks -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <a href="{% url 'predictions:future_recommendations' %}" class="card text-decoration-none border-danger">
+                <div class="card-body d-flex align-items-center gap-4">
+                    <i class="bi bi-graph-up-arrow display-4 text-danger"></i>
+                    <div>
+                        <h5 class="card-title mb-1">Top Stock Picks for 3-6 Months</h5>
+                        <p class="card-text text-muted mb-0">AI-powered multi-factor analysis identifies stocks with the highest growth potential over the next 3-6 months</p>
+                    </div>
+                    <span class="btn btn-danger btn-lg ms-auto">Explore Picks <i class="bi bi-arrow-right"></i></span>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Recent Predictions -->
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-clock-history"></i> Recent Predictions</h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_predictions %}
+                        {% for pred in recent_predictions %}
+                        <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+                            <div>
+                                <strong>Rs. {{ pred.investment_amount|floatformat:0 }}</strong>
+                                <br>
+                                <small class="text-muted">{{ pred.get_risk_level_display }} | {{ pred.get_market_display }}</small>
+                            </div>
+                            <a href="{% url 'predictions:results' pred.pk %}" class="btn btn-sm btn-outline-primary">
+                                View
+                            </a>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted text-center py-4">
+                            No predictions yet. <a href="{% url 'predictions:prediction_form' %}">Get your first recommendation</a>
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Portfolio Summary -->
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="bi bi-briefcase"></i> Portfolio Summary</h5>
+                </div>
+                <div class="card-body">
+                    {% if portfolio_holdings %}
+                        {% for holding in portfolio_holdings|slice:":5" %}
+                        <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+                            <div>
+                                <strong>{{ holding.symbol }}</strong>
+                                <br>
+                                <small class="text-muted">{{ holding.quantity }} shares @ Rs. {{ holding.buy_price }}</small>
+                            </div>
+                            <div class="text-end">
+                                <span class="{% if holding.profit_loss >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                    Rs. {{ holding.profit_loss|floatformat:0 }}
+                                </span>
+                                <br>
+                                <small class="{% if holding.profit_loss_pct >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                    {{ holding.profit_loss_pct|floatformat:1 }}%
+                                </small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        {% if portfolio_holdings.count > 5 %}
+                        <div class="text-center mt-2">
+                            <a href="{% url 'predictions:portfolio' %}" class="btn btn-sm btn-outline-success">
+                                View All Holdings
+                            </a>
+                        </div>
+                        {% endif %}
+                    {% else %}
+                        <p class="text-muted text-center py-4">
+                            No holdings yet. <a href="{% url 'predictions:portfolio' %}">Add your first holding</a>
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Market Overview Link -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card bg-light">
+                <div class="card-body text-center">
+                    <h5>Explore More Tools</h5>
+                    <a href="{% url 'predictions:market_overview' %}" class="btn btn-outline-primary me-2">
+                        <i class="bi bi-bar-chart"></i> Market Overview
+                    </a>
+                    <a href="{% url 'predictions:compare' %}" class="btn btn-outline-secondary me-2">
+                        <i class="bi bi-arrow-left-right"></i> Compare Stocks
+                    </a>
+                    <a href="{% url 'stocks:search' %}" class="btn btn-outline-info">
+                        <i class="bi bi-search"></i> Stock Analysis
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

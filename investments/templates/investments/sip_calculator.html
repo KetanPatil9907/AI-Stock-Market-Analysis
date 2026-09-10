@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}SIP Calculator | Money Planner{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{% url 'investments:home' %}">Money Planner</a>
+            </li>
+            <li class="breadcrumb-item active">SIP Calculator</li>
+        </ol>
+    </nav>
+
+    <div class="row g-4">
+
+        <!-- LEFT: Form -->
+        <div class="col-lg-5">
+            <div class="mp-section">
+                <h3 class="fw-bold mb-2">
+                    <i class="bi bi-calculator me-2"></i>SIP Calculator
+                </h3>
+                <p class="text-muted mb-4">
+                    Calculate the future value of your monthly SIP
+                    investment with compound returns.
+                </p>
+
+                <form method="post" novalidate>
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label for="{{ form.monthly_amount.id_for_label }}" class="form-label fw-semibold">
+                            Monthly SIP Amount (₹)
+                        </label>
+                        {{ form.monthly_amount }}
+                        {% if form.monthly_amount.errors %}
+                            <div class="text-danger small">{{ form.monthly_amount.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.annual_return.id_for_label }}" class="form-label fw-semibold">
+                            Expected Annual Return (%)
+                        </label>
+                        {{ form.annual_return }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.years.id_for_label }}" class="form-label fw-semibold">
+                            Investment Duration (Years)
+                        </label>
+                        {{ form.years }}
+                    </div>
+
+                    <button type="submit" class="btn btn-finance w-100">
+                        <i class="bi bi-calculator me-2"></i>Calculate
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- RIGHT: Results -->
+        <div class="col-lg-7">
+            {% if result %}
+            <div class="mp-section mb-4">
+                <h4 class="fw-bold mb-3">Result</h4>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <div class="mp-stat-card">
+                            <div class="mp-stat-label">Total Invested</div>
+                            <div class="mp-stat-value">
+                                ₹{{ result.total_invested|floatformat:0 }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mp-stat-card">
+                            <div class="mp-stat-label">Wealth Gained</div>
+                            <div class="mp-stat-value text-success">
+                                ₹{{ result.total_returns|floatformat:0 }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mp-stat-card">
+                            <div class="mp-stat-label">Future Value</div>
+                            <div class="mp-stat-value text-primary">
+                                ₹{{ result.future_value|floatformat:0 }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <canvas id="sipChart" height="80"></canvas>
+            </div>
+
+            <!-- Projection Table -->
+            <div class="mp-section">
+                <h4 class="fw-bold mb-3">Year-by-Year Breakdown</h4>
+                <div class="table-responsive" style="max-height: 350px; overflow-y: auto;">
+                    <table class="table table-sm align-middle">
+                        <thead class="table-light sticky-top">
+                            <tr>
+                                <th>Year</th>
+                                <th>Invested</th>
+                                <th>Value</th>
+                                <th>Returns</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in result.table %}
+                            <tr>
+                                <td>{{ row.year }}</td>
+                                <td>₹{{ row.invested|floatformat:0 }}</td>
+                                <td>₹{{ row.value|floatformat:0 }}</td>
+                                <td class="text-success">₹{{ row.returns|floatformat:0 }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% else %}
+            <div class="mp-section text-center py-5">
+                <i class="bi bi-calculator mp-empty-icon"></i>
+                <p class="text-muted mt-2">
+                    Enter your SIP details and click Calculate to see
+                    projections.
+                </p>
+            </div>
+            {% endif %}
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% if result %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const ctx = document.getElementById("sipChart").getContext("2d");
+
+    const labels = [
+        {% for row in result.table %}"Year {{ row.year }}"{% if not forloop.last %},{% endif %}{% endfor %}
+    ];
+    const invested = [
+        {% for row in result.table %}{{ row.invested }}{% if not forloop.last %},{% endif %}{% endfor %}
+    ];
+    const values = [
+        {% for row in result.table %}{{ row.value }}{% if not forloop.last %},{% endif %}{% endfor %}
+    ];
+
+    new Chart(ctx, {
+        type: "line",
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: "Portfolio Value",
+                    data: values,
+                    borderColor: "#155eef",
+                    backgroundColor: "rgba(21,94,239,0.1)",
+                    fill: true,
+                    tension: 0.3,
+                },
+                {
+                    label: "Total Invested",
+                    data: invested,
+                    borderColor: "#94a3b8",
+                    borderDash: [5, 5],
+                    fill: false,
+                    tension: 0.3,
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    ticks: {
+                        callback: v => "₹" + v.toLocaleString("en-IN"),
+                    },
+                },
+            },
+        }
+    });
+});
+</script>
+{% endif %}
+{% endblock %}

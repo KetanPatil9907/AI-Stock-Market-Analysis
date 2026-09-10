@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block title %}Financial Profile | Money Planner{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{% url 'investments:home' %}">Money Planner</a>
+            </li>
+            <li class="breadcrumb-item active">Financial Profile</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+
+            <div class="mp-section mb-4">
+                <h2 class="fw-bold mb-2">
+                    <i class="bi bi-person-lines-fill me-2"></i>Financial Profile
+                </h2>
+                <p class="text-muted">
+                    Tell us about your financial situation so we can
+                    calculate a suitable investment plan.
+                </p>
+
+                {% if profile and profile.risk_tolerance %}
+                <div class="d-inline-block mb-3">
+                    <span class="badge bg-primary fs-6">
+                        <i class="bi bi-shield me-1"></i>
+                        Risk Profile: {{ profile.get_risk_tolerance_display }}
+                        ({{ profile.risk_score }}/100)
+                    </span>
+                </div>
+                {% endif %}
+            </div>
+
+            <form method="post" novalidate>
+                {% csrf_token %}
+
+                <div class="mp-form-card mb-3">
+                    <h5 class="mb-3">
+                        <i class="bi bi-person me-2"></i>Personal Info
+                    </h5>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label for="{{ form.age.id_for_label }}" class="form-label fw-semibold">
+                                Age
+                            </label>
+                            {{ form.age }}
+                            {% if form.age.errors %}
+                                <div class="text-danger small">{{ form.age.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label for="{{ form.income_range.id_for_label }}" class="form-label fw-semibold">
+                                Income Range
+                            </label>
+                            {{ form.income_range }}
+                        </div>
+                        <div class="col-md-4">
+                            <label for="{{ form.experience.id_for_label }}" class="form-label fw-semibold">
+                                Investment Experience
+                            </label>
+                            {{ form.experience }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mp-form-card mb-3">
+                    <h5 class="mb-3">
+                        <i class="bi bi-currency-rupee me-2"></i>Monthly Finances
+                    </h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.monthly_income.id_for_label }}" class="form-label fw-semibold">
+                                Monthly Income (₹)
+                            </label>
+                            {{ form.monthly_income }}
+                            {% if form.monthly_income.errors %}
+                                <div class="text-danger small">{{ form.monthly_income.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.monthly_expenses.id_for_label }}" class="form-label fw-semibold">
+                                Monthly Expenses (₹)
+                            </label>
+                            {{ form.monthly_expenses }}
+                            {% if form.monthly_expenses.errors %}
+                                <div class="text-danger small">{{ form.monthly_expenses.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mp-form-card mb-3">
+                    <h5 class="mb-3">
+                        <i class="bi bi-piggy-bank me-2"></i>Existing Savings
+                    </h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.existing_investments.id_for_label }}" class="form-label fw-semibold">
+                                Current Investment Value (₹)
+                            </label>
+                            {{ form.existing_investments }}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.emergency_fund.id_for_label }}" class="form-label fw-semibold">
+                                Emergency Fund (₹)
+                            </label>
+                            {{ form.emergency_fund }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-finance btn-lg px-5">
+                        <i class="bi bi-check2-circle me-2"></i>Save Profile
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}
