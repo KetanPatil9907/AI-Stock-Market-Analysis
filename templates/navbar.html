@@ -1,3 +1,4 @@
+{% with current_app=request.resolver_match.app_name %}
 <nav class="navbar navbar-expand-lg navbar-dark finance-navbar sticky-top">
     <div class="container">
         <a
@@ -5,7 +6,8 @@
             href="{% if user.is_authenticated %}{% url 'dashboard:home' %}{% else %}{% url 'accounts:login' %}{% endif %}"
         >
             <i class="bi bi-graph-up-arrow me-2"></i>
-            AI Finance Assistant
+            AI Finance
+            <span class="fw-light">Assistant</span>
         </a>
 
         <button
@@ -28,7 +30,7 @@
                 {% if user.is_authenticated %}
                     <li class="nav-item">
                         <a
-                            class="nav-link"
+                            class="nav-link {% if current_app == 'dashboard' %}active{% endif %}"
                             href="{% url 'dashboard:home' %}"
                         >
                             <i class="bi bi-grid me-1"></i>
@@ -37,54 +39,56 @@
                     </li>
 
                     <li class="nav-item">
-    <a
-        class="nav-link"
-        href="{% url 'stocks:search' %}"
-    >
-        <i class="bi bi-graph-up-arrow me-1"></i>
-        Stocks
-    </a>
-</li>
+                        <a
+                            class="nav-link {% if current_app == 'stocks' %}active{% endif %}"
+                            href="{% url 'stocks:search' %}"
+                        >
+                            <i class="bi bi-graph-up-arrow me-1"></i>
+                            Stocks
+                        </a>
+                    </li>
 
                     <li class="nav-item">
-    <a
-        class="nav-link"
-        href="{% url 'ipo:center' %}"
-    >
-        <i class="bi bi-buildings me-1"></i>
-        IPO Center
-    </a>
-</li>
-
-                   <li class="nav-item">
-    <a
-        class="nav-link"
-        href="{% url 'investments:home' %}"
-    >
-        <i class="bi bi-calculator me-1"></i>
-        Money Planner
-    </a>
-</li>
+                        <a
+                            class="nav-link {% if current_app == 'ipo' %}active{% endif %}"
+                            href="{% url 'ipo:center' %}"
+                        >
+                            <i class="bi bi-buildings me-1"></i>
+                            IPO Center
+                        </a>
+                    </li>
 
                     <li class="nav-item">
-    <a
-        class="nav-link"
-        href="{% url 'predictions:home' %}"
-    >
-        <i class="bi bi-robot me-1"></i>
-        Predictions
-    </a>
-</li>
+                        <a
+                            class="nav-link {% if current_app == 'investments' %}active{% endif %}"
+                            href="{% url 'investments:home' %}"
+                        >
+                            <i class="bi bi-calculator me-1"></i>
+                            Money Planner
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a
+                            class="nav-link {% if current_app == 'predictions' %}active{% endif %}"
+                            href="{% url 'predictions:home' %}"
+                        >
+                            <i class="bi bi-robot me-1"></i>
+                            AI Insights
+                        </a>
+                    </li>
 
                     <li class="nav-item dropdown ms-lg-2">
                         <a
-                            class="nav-link dropdown-toggle"
+                            class="nav-link dropdown-toggle d-flex align-items-center gap-2"
                             href="#"
                             role="button"
                             data-bs-toggle="dropdown"
                             aria-expanded="false"
                         >
-                            <i class="bi bi-person-circle me-1"></i>
+                            <span class="nav-user-btn">
+                                {{ user.profile.full_name|first|upper }}
+                            </span>
                             {{ user.profile.full_name }}
                         </a>
 
@@ -154,3 +158,4 @@
         </div>
     </div>
 </nav>
+{% endwith %}

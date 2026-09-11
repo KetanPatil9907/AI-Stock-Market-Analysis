@@ -31,6 +31,13 @@ class MarketDataServiceError(Exception):
 class MarketDataService:
     SUFFIX = ".NS"  # NSE
 
+    # Indian index tickers used for the dashboard market snapshot.
+    INDEX_TICKERS = [
+        {"key": "^NSEI", "name": "NIFTY 50"},
+        {"key": "^BSESN", "name": "SENSEX"},
+        {"key": "^NSEBANK", "name": "BANK NIFTY"},
+    ]
+
     PERIOD_MAP = {
         "1D": ("1d", "5m"),
         "1W": ("5d", "15m"),
@@ -53,6 +60,61 @@ class MarketDataService:
         except Exception as e:
             logger.warning("search_stock failed for %s: %s", clean, e)
         return {"found": False, "symbol": clean}
+
+    def get_index_quotes(self) -> dict:
+        """Live snapshot of the major Indian indices.
+
+        Returns:
+            {
+              "indices": [
+                  {"name": "NIFTY 50", "value": 23398.1,
+                   "change_abs": -79.7, "change_pct": -0.34},
+                  ...
+              ],
+              "as_of": "<iso timestamp>",
+            }
+        """
+        quotes = []
+
+        for index in self.INDEX_TICKERS:
+            try:
+                info = yf.Ticker(index["key"]).fast_info
+                last = info.get("lastPrice")
+                if last is None:
+                    continue
+
+                prev = info.get("previousClose")
+                change_abs = None
+                change_pct = None
+                if prev:
+                    change_abs = float(last) - float(prev)
+                    change_pct = (change_abs / float(prev)) * 100
+            except Exception as e:
+                logger.warning(
+                    "Index quote failed for %s: %s", index["key"], e
+                )
+                continue
+
+            quotes.append({
+                "name": index["name"],
+                "value": round(float(last), 2),
+                "change_abs": (
+                    round(change_abs, 2)
+                    if change_abs is not None else None
+                ),
+                "change_pct": (
+                    round(change_pct, 2)
+                    if change_pct is not None else None
+                ),
+            })
+
+        if not quotes:
+            raise MarketDataServiceError("No index quotes available")
+
+        return {
+            "indices": quotes,
+            "as_of": datetime.now().isoformat(),
+        }
 
     def get_stock_quote(self, symbol: str) -> dict:
         clean = _clean_symbol(symbol)

@@ -4,362 +4,527 @@
 {% block title %}Dashboard | AI Finance Assistant{% endblock %}
 
 {% block extra_css %}
-<link
-    rel="stylesheet"
-    href="{% static 'dashboard/css/dashboard.css' %}"
->
+<link rel="stylesheet" href="{% static 'dashboard/css/dashboard.css' %}?v=2">
 {% endblock %}
 
 {% block content %}
 
+<section class="dash-page">
+    <div class="container">
 
+        <!-- ====================================================
+             GREETING
+        ===================================================== -->
+        <div class="dash-greeting">
 
-<div class="finance-dashboard">
+            <div>
+                <span class="dash-eyebrow">
+                    <i class="bi bi-stars"></i>
+                    AI-Powered Financial Workspace
+                </span>
 
-    <!-- ================= HERO ================= -->
-    <section class="dashboard-hero">
-        <div>
-            <span class="dashboard-badge">
-                Educational Finance Platform
-            </span>
+                <h1 class="dash-title">
+                    Welcome, {{ user_display_name|default:"Investor" }}
+                </h1>
 
-            <h1>
-                Welcome, {{ request.user.profile.full_name|default:request.user.first_name|default:"Ketan" }}
-            </h1>
-
-            <p>
-                Explore financial concepts and AI-powered educational
-                analysis in one place.
-            </p>
-        </div>
-
-        <div class="hero-decoration">
-            <i class="bi bi-graph-up-arrow"></i>
-        </div>
-    </section>
-
-
-    <!-- ================= STATISTICS ================= -->
-    <section class="stats-grid">
-
-        <!-- Stock -->
-        <a href="{% url 'stocks:search' %}" class="stat-card stock-card">
-
-            <div class="stat-top">
-                <div class="stat-icon">
-                    <i class="bi bi-bar-chart-line"></i>
-                </div>
-
-                <div class="mini-chart">
-                    <svg viewBox="0 0 120 45">
-                        <polyline
-                            points="0,35 15,32 25,38 40,25 55,28 70,18 85,23 100,10 120,5"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                        />
-                    </svg>
-                </div>
+                <p class="dash-subtitle">
+                    Good {{ time_greeting }} — here is the pulse of your
+                    financial workspace today.
+                </p>
             </div>
 
-            <div class="stat-title">
-                Stock Analyses
-            </div>
+            <div class="dash-greeting-actions">
+                <button
+                    type="button"
+                    class="dash-icon-btn"
+                    title="Notifications"
+                    aria-label="Notifications"
+                >
+                    <i class="bi bi-bell"></i>
+                </button>
 
-            <div class="stat-number">
-                {{ total_stock_analyses|default:"0" }}
-            </div>
-
-            <div class="stat-footer">
-                <span>Market insights</span>
-                <i class="bi bi-arrow-up-right"></i>
-            </div>
-
-        </a>
-
-
-        <!-- IPO -->
-        <div class="stat-card ipo-card">
-
-            <div class="stat-top">
-                <div class="stat-icon">
-                    <i class="bi bi-buildings"></i>
-                </div>
-
-                <div class="circle-chart">
-                    <span>75%</span>
-                </div>
-            </div>
-
-            <div class="stat-title">
-                IPO Analyses
-            </div>
-
-            <div class="stat-number">
-                {{ total_ipo_analyses|default:"0" }}
-            </div>
-
-            <div class="stat-footer">
-                <span>IPO research</span>
-                <i class="bi bi-arrow-up-right"></i>
-            </div>
-
-        </div>
-
-
-        <!-- Investments -->
-        <div class="stat-card investment-card">
-
-            <div class="stat-top">
-                <div class="stat-icon">
-                    <i class="bi bi-briefcase"></i>
-                </div>
-
-                <div class="circle-chart investment-circle">
-                    <span>62%</span>
-                </div>
-            </div>
-
-            <div class="stat-title">
-                Investment Plans
-            </div>
-
-            <div class="stat-number">
-                {{ total_investment_plans|default:"0" }}
-            </div>
-
-            <div class="stat-footer">
-                <span>Planning tools</span>
-                <i class="bi bi-arrow-up-right"></i>
-            </div>
-
-        </div>
-
-
-        <!-- Saved -->
-        <div class="stat-card saved-card">
-
-            <div class="stat-top">
-                <div class="stat-icon">
-                    <i class="bi bi-bookmark-star"></i>
-                </div>
-
-                <div class="circle-chart saved-circle">
-                    <span>82%</span>
-                </div>
-            </div>
-
-            <div class="stat-title">
-                Saved Analyses
-            </div>
-
-            <div class="stat-number">
-                {{ total_saved_analyses|default:"0" }}
-            </div>
-
-            <div class="stat-footer">
-                <span>Your saved research</span>
-                <i class="bi bi-arrow-up-right"></i>
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- ================= MAIN CONTENT ================= -->
-    <section class="dashboard-main-grid">
-
-        <!-- LEFT SIDE -->
-        <div class="tools-section">
-
-            <div class="section-heading">
-                <div>
-                    <h2>Explore Finance Tools</h2>
-
-                    <p>
-                        Choose a learning or analysis module.
-                    </p>
-                </div>
-
-                <div class="compass-icon">
-                    <i class="bi bi-compass"></i>
-                </div>
-            </div>
-
-
-            <div class="tools-grid">
-
-                <!-- Risk Assessment -->
-                <a href="{% url 'stocks:search' %}" class="tool-card">
-
-                    <div class="tool-image risk-image">
-
-                        <div class="risk-gauge">
-                            <div class="gauge-value">
-                                Policy
-                                <strong>94%</strong>
-                            </div>
-                        </div>
-
-                    </div>
-
-                    <div class="tool-content">
-
-                        <h3>
-                            Risk Assessment Tool
-                        </h3>
-
-                        <p>
-                            A sample radar gauge can analyze a
-                            potential assessment context and
-                            analysis.
-                        </p>
-
-                    </div>
-
+                <a
+                    href="{% url 'accounts:profile' %}"
+                    class="dash-avatar"
+                    title="Your profile"
+                    aria-label="Your profile"
+                >
+                    {{ user_display_name|default:"U"|slice:":1"|upper }}
                 </a>
+            </div>
+
+        </div>
 
 
-                <!-- AI Prediction -->
-                <a href="{% url 'stocks:compare' %}" class="tool-card">
+        <!-- ====================================================
+             FINANCIAL OVERVIEW
+        ===================================================== -->
+        <div class="dash-card dash-overview">
 
-                    <div class="tool-image ai-image">
+            <div class="dash-section-head">
+                <h2>Financial Overview</h2>
+                <p>Your activity at a glance</p>
+            </div>
 
-                        <div class="ai-window">
+            <div class="dash-metrics">
 
-                            <div class="ai-sidebar"></div>
+                <!-- Market Status -->
+                <div class="dash-metric">
+                    <span class="dash-metric-icon {% if market_status_open %}green{% else %}gray{% endif %}">
+                        <i class="bi bi-broadcast"></i>
+                    </span>
+                    <div class="dash-metric-body">
+                        <div class="dash-status">
+                            <span
+                                class="dash-status-dot {% if market_status_open %}open{% else %}closed{% endif %}"
+                            ></span>
+                            <span class="dash-status-text">
+                                {% if market_status_open %}
+                                    Markets Open
+                                {% else %}
+                                    Markets Closed
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="dash-metric-label">
+                            NSE · Mon–Fri 9:15–15:30 IST
+                        </div>
+                    </div>
+                </div>
 
-                            <div class="ai-content">
+                <!-- Stock Analyses -->
+                <div class="dash-metric">
+                    <span class="dash-metric-icon blue">
+                        <i class="bi bi-graph-up-arrow"></i>
+                    </span>
+                    <div class="dash-metric-body">
+                        <div class="dash-metric-value">
+                            {{ total_stock_analyses|default:"—" }}
+                        </div>
+                        <div class="dash-metric-label">Stock Analyses</div>
+                    </div>
+                </div>
 
-                                <div class="ai-line"></div>
-                                <div class="ai-line short"></div>
+                <!-- IPO Analyses -->
+                <div class="dash-metric">
+                    <span class="dash-metric-icon purple">
+                        <i class="bi bi-buildings"></i>
+                    </span>
+                    <div class="dash-metric-body">
+                        <div class="dash-metric-value">
+                            {{ total_ipo_analyses|default:"—" }}
+                        </div>
+                        <div class="dash-metric-label">IPO Analyses</div>
+                    </div>
+                </div>
 
-                                <div class="ai-boxes">
-                                    <span></span>
-                                    <span></span>
-                                    <span></span>
+                <!-- Saved Analyses -->
+                <div class="dash-metric">
+                    <span class="dash-metric-icon amber">
+                        <i class="bi bi-bookmark-star"></i>
+                    </span>
+                    <div class="dash-metric-body">
+                        <div class="dash-metric-value">
+                            {{ total_saved_analyses|default:"—" }}
+                        </div>
+                        <div class="dash-metric-label">Saved Analyses</div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ====================================================
+             MARKET SNAPSHOT + AI FINANCE ASSISTANT
+        ===================================================== -->
+        <div class="dash-grid-2">
+
+            <!-- Market Snapshot -->
+            <div class="dash-card dash-card-hover">
+
+                <div class="dash-section-head">
+                    <h2>Market Snapshot</h2>
+                    <a
+                        href="{% url 'predictions:market_overview' %}"
+                        class="dash-cta"
+                    >
+                        View Market
+                        <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+
+                {% if market_quotes %}
+
+                    <div class="dash-index-list">
+                        {% for quote in market_quotes %}
+                            <div class="dash-index-row">
+                                <div>
+                                    <div class="dash-index-name">
+                                        {{ quote.name }}
+                                    </div>
+                                    <div class="dash-index-value">
+                                        {{ quote.value|floatformat:2 }}
+                                    </div>
                                 </div>
-
-                                <div class="ai-line"></div>
-                                <div class="ai-line medium"></div>
-
+                                <div class="dash-index-change {% if quote.up %}up{% else %}down{% endif %}">
+                                    {% if quote.change_abs is not None %}
+                                        {{ quote.change_abs|floatformat:2 }}
+                                        ({{ quote.change_pct|floatformat:2 }}%)
+                                    {% else %}
+                                        —
+                                    {% endif %}
+                                </div>
                             </div>
-
-                        </div>
-
+                        {% endfor %}
                     </div>
 
-                    <div class="tool-content">
+                    <div class="dash-market-footer">
+                        <span>
+                            <i class="bi bi-clock me-1"></i>
+                            Latest snapshot
+                        </span>
+                        <span>
+                            {{ market_as_of|default:"" }}
+                        </span>
+                    </div>
 
-                        <h3>
-                            AI Market Trend Prediction
-                        </h3>
+                {% endif %}
 
+                {% if not market_quotes %}
+
+                    <div class="dash-market-empty">
+                        <i class="bi bi-bar-chart-line"></i>
                         <p>
-                            AI Market trend prediction shows
-                            models within not rising and analyzes
-                            workflow forecasts.
+                            Market data currently unavailable.<br>
+                            Connect a market data source to view live prices.
                         </p>
-
                     </div>
 
-                </a>
+                {% endif %}
 
             </div>
 
 
-            <!-- ================= QUICK ACTIONS ================= -->
+            <!-- AI Finance Assistant -->
+            <div class="dash-card dash-assistant">
 
-            <div class="quick-actions">
+                <span class="dash-ai-badge">
+                    <i class="bi bi-magic"></i>
+                    AI Assistant
+                </span>
 
-                <a href="{% url 'stocks:search' %}" class="quick-action">
-                    <i class="bi bi-search"></i>
-                    <span>Analyze Stock</span>
-                </a>
+                <h3 class="dash-ai-title">
+                    <i class="bi bi-robot"></i>
+                    AI Finance Assistant
+                </h3>
 
-                <a href="#" class="quick-action">
-                    <i class="bi bi-buildings"></i>
-                    <span>Analyze IPO</span>
-                </a>
+                <p class="dash-ai-sub">
+                    Ask questions about stocks, IPOs, investments and
+                    market trends.
+                </p>
 
-                <a href="{% url 'stocks:compare' %}" class="quick-action">
-                    <i class="bi bi-wallet2"></i>
-                    <span>Compare Stocks</span>
-                </a>
+                <form
+                    class="dash-ai-form"
+                    action="{% url 'stocks:search' %}"
+                    method="get"
+                >
+                    <input
+                        type="text"
+                        class="dash-ai-input"
+                        name="symbol"
+                        placeholder="Ask about a stock, IPO or investment..."
+                        autocomplete="off"
+                        aria-label="Ask the AI assistant"
+                    >
+                    <button
+                        type="submit"
+                        class="dash-ai-btn"
+                    >
+                        Ask AI
+                        <i class="bi bi-arrow-right ms-1"></i>
+                    </button>
+                </form>
+
+                <div class="dash-chips">
+                    <a
+                        class="dash-chip"
+                        href="{% url 'stocks:analysis_detail' symbol='RELIANCE' %}"
+                    >
+                        Analyze RELIANCE
+                    </a>
+
+                    <a
+                        class="dash-chip"
+                        href="{% url 'stocks:compare' %}?symbols=HDFCBANK,ICICIBANK"
+                    >
+                        Compare HDFC vs ICICI
+                    </a>
+
+                    <a
+                        class="dash-chip"
+                        href="{% url 'ipo:center' %}"
+                    >
+                        Should I apply for this IPO?
+                    </a>
+
+                    <a
+                        class="dash-chip"
+                        href="{% url 'investments:home' %}"
+                    >
+                        Create an investment plan
+                    </a>
+                </div>
 
             </div>
 
         </div>
 
 
-        <!-- RIGHT SIDE -->
-        <aside class="activity-card">
-
-            <div class="activity-header">
-
-                <div>
-                    <h2>Recent Activity</h2>
-
-                    <p>
-                        Your most recent searches and analyses.
-                    </p>
-                </div>
-
+        <!-- ====================================================
+             FINANCE TOOLS
+        ===================================================== -->
+        <div class="dash-section-head mt-5">
+            <div>
+                <h2>Finance Tools</h2>
+                <p>Access your financial analysis and planning tools.</p>
             </div>
+        </div>
 
+        <div class="dash-tools">
 
-            <div class="activity-list">
-                {% for activity in recent_activity %}
-                    <div class="activity-item">
-                        {% if activity.activity_type == "IPO_ANALYSIS" or activity.activity_type == "IPO_SEARCH" %}
-                            <div class="activity-icon green">
-                                <i class="bi bi-buildings"></i>
-                            </div>
-                        {% elif activity.activity_type == "STOCK_COMPARISON" %}
-                            <div class="activity-icon cyan">
-                                <i class="bi bi-arrow-left-right"></i>
-                            </div>
-                        {% elif activity.activity_type == "EDUCATION_VIEW" %}
-                            <div class="activity-icon cyan">
-                                <i class="bi bi-file-earmark-text"></i>
-                            </div>
-                        {% elif activity.activity_type == "INVESTMENT_PLAN" %}
-                            <div class="activity-icon red">
-                                <i class="bi bi-robot"></i>
-                            </div>
-                        {% else %}
-                            <div class="activity-icon blue">
-                                <i class="bi bi-graph-up"></i>
-                            </div>
-                        {% endif %}
-                        <div class="activity-text">
-                            <p>{{ activity.title }}</p>
-                            <span>{{ activity.created_at|timesince }} ago</span>
-                        </div>
-                    </div>
-                {% empty %}
-                    <div class="activity-item">
-                        <div class="activity-icon blue">
-                            <i class="bi bi-info-circle"></i>
-                        </div>
-                        <div class="activity-text">
-                            <p>No recent activity yet. Start analyzing stocks or IPOs.</p>
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
-
-
-            <a href="#" class="view-all">
-                View all activity
-                <i class="bi bi-arrow-right"></i>
+            <!-- Stock Analysis -->
+            <a
+                class="dash-tool-card"
+                href="{% url 'stocks:search' %}"
+            >
+                <span class="dash-tool-icon blue">
+                    <i class="bi bi-graph-up-arrow"></i>
+                </span>
+                <h3>Stock Analysis</h3>
+                <p>Search stocks and get detailed financial analysis.</p>
+                <span class="dash-tool-link">
+                    Analyze
+                    <i class="bi bi-arrow-right"></i>
+                </span>
             </a>
 
-        </aside>
+            <!-- IPO Center -->
+            <a
+                class="dash-tool-card"
+                href="{% url 'ipo:center' %}"
+            >
+                <span class="dash-tool-icon purple">
+                    <i class="bi bi-buildings"></i>
+                </span>
+                <h3>IPO Center</h3>
+                <p>Explore upcoming IPOs, GMP and subscription information.</p>
+                <span class="dash-tool-link">
+                    Explore
+                    <i class="bi bi-arrow-right"></i>
+                </span>
+            </a>
 
-    </section>
+            <!-- Money Planner -->
+            <a
+                class="dash-tool-card"
+                href="{% url 'investments:home' %}"
+            >
+                <span class="dash-tool-icon green">
+                    <i class="bi bi-wallet2"></i>
+                </span>
+                <h3>Money Planner</h3>
+                <p>Create an investment plan based on your amount and risk profile.</p>
+                <span class="dash-tool-link">
+                    Plan
+                    <i class="bi bi-arrow-right"></i>
+                </span>
+            </a>
 
-</div>
+            <!-- AI Insights -->
+            <a
+                class="dash-tool-card"
+                href="{% url 'predictions:home' %}"
+            >
+                <span class="dash-tool-icon amber">
+                    <i class="bi bi-robot"></i>
+                </span>
+                <h3>AI Insights</h3>
+                <p>View AI-powered market insights and predictions.</p>
+                <span class="dash-tool-link">
+                    View Insights
+                    <i class="bi bi-arrow-right"></i>
+                </span>
+            </a>
+
+        </div>
+
+
+        <!-- ====================================================
+             RECENT ANALYSES + AI INSIGHTS
+        ===================================================== -->
+        <div class="dash-grid-2">
+
+            <!-- Recent Analyses -->
+            <div class="dash-card">
+
+                <div class="dash-section-head">
+                    <h2>Recent Analyses</h2>
+                    <p>Your latest activity</p>
+                </div>
+
+                {% if recent_activity %}
+
+                    <div class="dash-activity-list">
+                        {% for activity in recent_activity %}
+                            <div class="dash-activity-item">
+                                <span class="dash-activity-icon {{ activity.color_class|default:'gray' }}">
+                                    <i class="bi {{ activity.icon_class|default:'bi-lightning' }}"></i>
+                                </span>
+
+                                <div class="dash-activity-body">
+                                    <p class="dash-activity-title"
+                                       title="{{ activity.title }}">
+                                        {{ activity.title }}
+                                    </p>
+                                    <p class="dash-activity-meta"
+                                       title="{{ activity.description }}">
+                                        {{ activity.description|truncatewords:14 }}
+                                    </p>
+                                </div>
+
+                                <span class="dash-activity-time">
+                                    {{ activity.created_at|timesince }} ago
+                                </span>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                {% else %}
+
+                    <div class="dash-activity-empty">
+                        <i class="bi bi-inbox"></i>
+                        <p>No analyses yet</p>
+                        <a
+                            href="{% url 'stocks:search' %}"
+                            class="dash-cta"
+                        >
+                            Start your first analysis
+                            <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- AI Insights -->
+            <div class="dash-card">
+
+                <div class="dash-section-head">
+                    <h2>AI Insights</h2>
+                    <p>Derived from your activity</p>
+                </div>
+
+                {% if total_stock_analyses or total_ipo_analyses or total_investment_plans or total_saved_analyses %}
+
+                    <div>
+
+                        {% if total_stock_analyses %}
+                            <div class="dash-insight-item">
+                                <span class="dash-insight-icon">
+                                    <i class="bi bi-graph-up-arrow"></i>
+                                </span>
+                                <p class="dash-insight-text">
+                                    You have run {{ total_stock_analyses }}
+                                    stock analyses.
+                                    <span>Educational scorecards from the Stock
+                                        Analysis engine.</span>
+                                </p>
+                            </div>
+                        {% endif %}
+
+                        {% if total_ipo_analyses %}
+                            <div class="dash-insight-item">
+                                <span class="dash-insight-icon">
+                                    <i class="bi bi-buildings"></i>
+                                </span>
+                                <p class="dash-insight-text">
+                                    You have reviewed {{ total_ipo_analyses }}
+                                    IPO{{ total_ipo_analyses|pluralize }}.
+                                    <span>Scored educational analyses from the
+                                        IPO Center.</span>
+                                </p>
+                            </div>
+                        {% endif %}
+
+                        {% if total_investment_plans %}
+                            <div class="dash-insight-item">
+                                <span class="dash-insight-icon">
+                                    <i class="bi bi-piggy-bank"></i>
+                                </span>
+                                <p class="dash-insight-text">
+                                    You created {{ total_investment_plans }}
+                                    investment plan{{ total_investment_plans|pluralize }}.
+                                    <span>Allocation plans from the Money
+                                        Planner.</span>
+                                </p>
+                            </div>
+                        {% endif %}
+
+                        {% if total_saved_analyses %}
+                            <div class="dash-insight-item">
+                                <span class="dash-insight-icon">
+                                    <i class="bi bi-bookmark-star"></i>
+                                </span>
+                                <p class="dash-insight-text">
+                                    You have {{ total_saved_analyses }}
+                                    saved analyses.
+                                    <span>Your saved analyses are bookmarked
+                                        for quick access.</span>
+                                </p>
+                            </div>
+                        {% endif %}
+
+                        <div class="dash-market-footer">
+                            <span>Run more analyses to improve insights.</span>
+                            <a
+                                href="{% url 'stocks:search' %}"
+                                class="dash-cta"
+                            >
+                                Analyze
+                                <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+
+                    </div>
+
+                {% else %}
+
+                    <div class="dash-insight-empty">
+                        <i class="bi bi-lightbulb"></i>
+                        <p>
+                            No AI insights available yet.<br>
+                            Run an analysis to generate insights.
+                        </p>
+                        <a
+                            href="{% url 'stocks:search' %}"
+                            class="dash-cta"
+                        >
+                            Run an analysis
+                            <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </div>
+</section>
 
 {% endblock %}

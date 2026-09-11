@@ -87,15 +87,4 @@ urlpatterns = [
         views.UserPasswordResetCompleteView.as_view(),
         name="password_reset_complete",
     ),
-
-
-    # ==================================================
-    # CLERK LOGIN
-    # ==================================================
-
-    path(
-        "clerk-login/",
-        views.clerk_login_view,
-        name="clerk_login",
-    ),
 ]
