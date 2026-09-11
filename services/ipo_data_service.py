@@ -543,9 +543,9 @@ class IPODataService:
                 "listing_date":
                     listing_date,
 
-                # GMP will come from API 2 later
-                "gmp":
-                    None,
+                # GMP is managed by the separate InvestorGain sync
+                # (services/gmp_data_service.py). It is intentionally
+                # not set here so existing GMP is preserved.
 
                 "total_subscription":
                     total_subscription,

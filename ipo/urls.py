@@ -7,6 +7,16 @@ app_name = "ipo"
 urlpatterns = [
     path("", views.ipo_center_view, name="center"),
     path(
+        "explain/",
+        views.ipo_explain_view,
+        name="explain",
+    ),
+    path(
+        "refresh-gmp/",
+        views.refresh_gmp_view,
+        name="refresh_gmp",
+    ),
+    path(
         "<slug:slug>/",
         views.ipo_detail_view,
         name="detail",

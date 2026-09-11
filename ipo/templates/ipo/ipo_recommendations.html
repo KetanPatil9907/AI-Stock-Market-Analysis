@@ -1,29 +1,59 @@
-{% if ipo_items %}
+{% if rec_items %}
+
+    <div class="d-flex align-items-center justify-content-between mb-3">
+
+        <div>
+            <h2 class="h4 fw-bold mb-1">
+                <i class="bi bi-stars me-2"></i>
+                Our IPO Recommendations
+            </h2>
+
+            <p class="text-muted mb-0">
+                Transparent, educational guidance for the IPOs that can
+                still be applied to. Based on GMP premium, subscription,
+                and financial fundamentals.
+            </p>
+        </div>
+
+        <span class="badge text-bg-light border">
+            {{ rec_items|length }} IPOs
+        </span>
+
+    </div>
+
+    <!-- LEGEND -->
+    <div class="d-flex flex-wrap gap-2 mb-4">
+        <span class="rec-badge rec-strong">Strong Apply</span>
+        <span class="rec-badge rec-apply">Apply</span>
+        <span class="rec-badge rec-neutral">Evaluate</span>
+        <span class="rec-badge rec-avoid">Avoid</span>
+        <span class="rec-badge rec-na">Insufficient Data</span>
+    </div>
+
     <div class="row g-4">
-        {% for item in ipo_items %}
+        {% for item in rec_items %}
+
             <div class="col-md-6 col-xl-4">
                 <div class="card border-0 shadow-sm ipo-card h-100">
                     <div class="card-body p-4 d-flex flex-column">
 
-                        <div class="d-flex justify-content-between align-items-start gap-2 mb-3">
+                        <div
+                            class="d-flex justify-content-between align-items-start gap-2 mb-3"
+                        >
                             <span class="badge ipo-status-badge">
                                 {{ item.ipo.get_status_display }}
                             </span>
 
-                            {% if item.has_sufficient_data %}
-                                <span class="ipo-score-pill">
-                                    {{ item.overall_score }}/100
-                                </span>
-                            {% else %}
-                                <span class="badge text-bg-secondary">
-                                    Limited data
-                                </span>
-                            {% endif %}
+                            <span
+                                class="rec-badge rec-{{ item.recommendation|lower }}"
+                            >
+                                {{ item.recommendation_label }}
+                            </span>
                         </div>
 
-                        <h2 class="h5 fw-bold mb-1">
+                        <h3 class="h5 fw-bold mb-1">
                             {{ item.ipo.company_name }}
-                        </h2>
+                        </h3>
 
                         <p class="text-muted small mb-3">
                             {% if item.ipo.industry %}
@@ -33,36 +63,14 @@
                             {% endif %}
                         </p>
 
-                        <div class="ipo-data-grid mb-4">
+                        <div class="ipo-data-grid mb-3">
                             <div>
-                                <span class="ipo-data-label">
-                                    Price Band
-                                </span>
-
-                                <strong>
-                                    {{ item.ipo.price_band_display }}
-                                </strong>
+                                <span class="ipo-data-label">Price Band</span>
+                                <strong>{{ item.ipo.price_band_display }}</strong>
                             </div>
 
                             <div>
-                                <span class="ipo-data-label">
-                                    Issue Size
-                                </span>
-
-                                <strong>
-                                    {% if item.ipo.issue_size_crore is not None %}
-                                        ₹{{ item.ipo.issue_size_crore }} Cr
-                                    {% else %}
-                                        Data unavailable
-                                    {% endif %}
-                                </strong>
-                            </div>
-
-                            <div>
-                                <span class="ipo-data-label">
-                                    Lot Size
-                                </span>
-
+                                <span class="ipo-data-label">Lot Size</span>
                                 <strong>
                                     {% if item.ipo.lot_size %}
                                         {{ item.ipo.lot_size }} shares
@@ -84,7 +92,6 @@
                                 <strong>
                                     {% if item.ipo.gmp is not None %}
                                         ₹{{ item.ipo.gmp }}
-
                                         {% if item.gmp_premium_pct is not None %}
                                             <span
                                                 class="gmp-premium {% if item.gmp_premium_pct < 0 %}text-danger{% else %}text-success{% endif %}"
@@ -103,10 +110,7 @@
                             </div>
 
                             <div>
-                                <span class="ipo-data-label">
-                                    Subscription
-                                </span>
-
+                                <span class="ipo-data-label">Subscription</span>
                                 <strong>
                                     {% if item.ipo.total_subscription is not None %}
                                         {{ item.ipo.total_subscription }}x
@@ -115,53 +119,39 @@
                                     {% endif %}
                                 </strong>
                             </div>
-                        </div>
 
-                        <div class="ipo-date-box mb-3">
                             <div>
-                                <i class="bi bi-calendar-event me-2"></i>
-
-                                {% if item.ipo.status == "OPEN" %}
-                                    {% if item.ipo.close_date %}
-                                        Closes {{ item.ipo.close_date|date:"d M Y" }}
-                                    {% else %}
-                                        Closing date unavailable
-                                    {% endif %}
-                                {% elif item.ipo.status == "UPCOMING" %}
-                                    {% if item.ipo.open_date %}
-                                        Opens {{ item.ipo.open_date|date:"d M Y" }}
-                                    {% else %}
-                                        Opening date unavailable
-                                    {% endif %}
-                                {% elif item.ipo.status == "CLOSED" %}
-                                    {% if item.ipo.close_date %}
-                                        Closed {{ item.ipo.close_date|date:"d M Y" }}
-                                    {% else %}
-                                        Closing date unavailable
-                                    {% endif %}
-                                {% elif item.ipo.status == "LISTED" %}
-                                    {% if item.ipo.listing_date %}
-                                        Listed {{ item.ipo.listing_date|date:"d M Y" }}
-                                    {% else %}
-                                        Listing date unavailable
-                                    {% endif %}
-                                {% else %}
-                                    IPO date details unavailable
-                                {% endif %}
+                                <span class="ipo-data-label">Overall Score</span>
+                                <strong>{{ item.overall_score }}/100</strong>
                             </div>
 
-                            {% if item.ipo.listing_date %}
-                                <div class="mt-1">
-                                    <i class="bi bi-rocket-takeoff me-2"></i>
-
-                                    {% if item.ipo.status == "UPCOMING" or item.ipo.status == "OPEN" %}
-                                        Listing {{ item.ipo.listing_date|date:"d M Y" }}
+                            <div>
+                                <span class="ipo-data-label">
+                                    {% if item.ipo.close_date %}
+                                        Closing Date
                                     {% else %}
-                                        Listed {{ item.ipo.listing_date|date:"d M Y" }}
+                                        Opening Date
                                     {% endif %}
-                                </div>
-                            {% endif %}
+                                </span>
+                                <strong>
+                                    {% if item.ipo.close_date %}
+                                        {{ item.ipo.close_date|date:"d M Y" }}
+                                    {% elif item.ipo.open_date %}
+                                        {{ item.ipo.open_date|date:"d M Y" }}
+                                    {% else %}
+                                        Data unavailable
+                                    {% endif %}
+                                </strong>
+                            </div>
                         </div>
+
+                        {% if item.recommendation_reasons %}
+                            <ul class="rec-reasons mb-3">
+                                {% for reason in item.recommendation_reasons %}
+                                    <li>{{ reason }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
 
                         <div class="mt-auto">
                             <a
@@ -172,25 +162,29 @@
                                 <i class="bi bi-arrow-right ms-1"></i>
                             </a>
                         </div>
+
                     </div>
                 </div>
             </div>
+
         {% endfor %}
     </div>
+
 {% else %}
+
     <div class="card border-0 shadow-sm">
         <div class="card-body text-center py-5">
-            <div class="empty-state-icon mb-3">
-                <i class="bi bi-building"></i>
-            </div>
+            <i class="bi bi-stars fs-1 text-muted"></i>
 
-            <h2 class="h5 fw-bold">
-                {{ empty_title }}
+            <h2 class="h5 fw-bold mt-3">
+                No IPOs available for recommendation
             </h2>
 
             <p class="text-muted mb-0">
-                {{ empty_message }}
+                Recommendations will appear here when there are open or
+                upcoming IPOs with enough stored data to evaluate.
             </p>
         </div>
     </div>
+
 {% endif %}

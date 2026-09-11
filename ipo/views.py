@@ -4,6 +4,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
 from dashboard.models import AIAnalysisLog
+from services.gmp_data_service import GmpDataService
 
 from .models import IPO, IPOAnalysis
 from .services import IPOAnalysisService
@@ -17,9 +18,11 @@ def ipo_center_view(request):
     # OPEN IPOs
     # =========================================================
 
-    open_ipos = IPO.objects.filter(
-        status="OPEN",
-        is_active=True,
+    open_ipos = list(
+        IPO.objects.filter(
+            status="OPEN",
+            is_active=True,
+        )
     )
 
     # Separate Open IPOs into SME and Mainboard
@@ -75,26 +78,46 @@ def ipo_center_view(request):
     # UPCOMING IPOs
     # =========================================================
 
-    upcoming_ipos = IPO.objects.filter(
-        status="UPCOMING",
-        is_active=True,
+    upcoming_raw_ipos = list(
+        IPO.objects.filter(
+            status="UPCOMING",
+            is_active=True,
+        )
     )
 
     upcoming_ipos = analysis_service.get_ranked_ipos(
-        upcoming_ipos
+        upcoming_raw_ipos
     )
 
     # =========================================================
-    # RECENTLY LISTED / CLOSED IPOs
+    # CLOSED IPOs
     # =========================================================
 
-    recently_listed_ipos = IPO.objects.filter(
-        status__in=["LISTED", "CLOSED"],
-        is_active=True,
+    closed_ipos = analysis_service.get_ranked_ipos(
+        IPO.objects.filter(
+            status="CLOSED",
+            is_active=True,
+        ).order_by("-close_date")
     )
+
+    # =========================================================
+    # RECENTLY LISTED IPOs
+    # =========================================================
 
     recently_listed_ipos = analysis_service.get_ranked_ipos(
-        recently_listed_ipos
+        IPO.objects.filter(
+            status="LISTED",
+            is_active=True,
+        ).order_by("-listing_date")
+    )
+
+    # =========================================================
+    # OUR IPO RECOMMENDATIONS
+    # =========================================================
+    # Built only for IPOs that can still be applied to.
+
+    recommendations = analysis_service.build_recommendations(
+        open_ipos + upcoming_raw_ipos
     )
 
     # =========================================================
@@ -137,11 +160,52 @@ def ipo_center_view(request):
 
             # Other IPO sections
             "upcoming_ipos": upcoming_ipos,
+            "closed_ipos": closed_ipos,
             "recently_listed_ipos": recently_listed_ipos,
+
+            # Our IPO recommendations
+            "recommendations": recommendations,
 
             # Highest ranked IPO
             "highest_ranked_ipo": highest_ranked_ipo,
         },
+    )
+
+
+# =============================================================
+# REFRESH IPO GMP
+# =============================================================
+
+@login_required
+@require_POST
+def refresh_gmp_view(request):
+    result = GmpDataService.sync_gmp_to_database()
+
+    if result["updated"]:
+        messages.success(
+            request,
+            f"GMP refreshed for {result['updated']} IPO records "
+            f"({len(result['matched'])} live IPOs matched).",
+        )
+    else:
+        messages.info(
+            request,
+            "No GMP updates were applied. "
+            "The source may have no live data right now.",
+        )
+
+    return redirect("ipo:center")
+
+
+# =============================================================
+# IPO EXPLAIN - WHAT IS AN IPO
+# =============================================================
+
+@login_required
+def ipo_explain_view(request):
+    return render(
+        request,
+        "ipo/ipo_explain.html",
     )
 
 

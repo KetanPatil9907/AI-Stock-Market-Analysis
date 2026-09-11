@@ -291,8 +291,8 @@ class IPOAgent:
 
         return items
 
-    def analyze(self, ipo_data):
-        if not self._has_enough_data(ipo_data):
+    def analyze(self, ipo_data, require_data=True):
+        if require_data and not self._has_enough_data(ipo_data):
             return {
                 "fundamental_score": 0,
                 "gmp_score": 0,

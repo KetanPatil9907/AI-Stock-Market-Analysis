@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}What is an IPO? | AI Finance Assistant{% endblock %}
+
+{% block content %}
+<section class="py-4 py-lg-5">
+    <div class="container">
+
+        <a
+            href="{% url 'ipo:center' %}"
+            class="text-decoration-none small"
+        >
+            <i class="bi bi-arrow-left me-1"></i>
+            Back to IPO Center
+        </a>
+
+        <div class="d-flex flex-column flex-lg-row justify-content-between gap-3 mt-3 mb-4">
+            <div>
+                <span class="badge educational-badge mb-2">
+                    Educational IPO Guide
+                </span>
+
+                <h1 class="display-6 fw-bold mb-2">
+                    What is an IPO?
+                </h1>
+
+                <p class="lead text-muted mb-0">
+                    Everything you need to understand an Initial Public
+                    Offering before applying.
+                </p>
+            </div>
+        </div>
+
+        {% include "ipo/ipo_explain_content.html" %}
+
+        <div class="alert disclaimer-alert mt-4 mb-0">
+            <div class="d-flex align-items-start">
+                <i class="bi bi-info-circle-fill me-3 fs-5"></i>
+
+                <div>
+                    <strong>Financial Disclaimer:</strong>
+                    This guide is for educational purposes only and is not
+                    financial, investment, tax, or legal advice.
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+{% endblock %}

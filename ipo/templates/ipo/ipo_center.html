@@ -25,11 +25,27 @@
                 </p>
             </div>
 
-            <div class="text-lg-end">
+            <div class="d-flex flex-column align-items-lg-end gap-2">
                 <span class="badge text-bg-light border">
                     <i class="bi bi-database me-1"></i>
                     Data managed through verified entries
                 </span>
+
+                <form
+                    method="post"
+                    action="{% url 'ipo:refresh_gmp' %}"
+                    class="m-0"
+                >
+                    {% csrf_token %}
+                    <button
+                        type="submit"
+                        class="btn btn-outline-primary btn-sm"
+                        title="Fetch the latest GMP from InvestorGain"
+                    >
+                        <i class="bi bi-arrow-repeat me-1"></i>
+                        Refresh GMP
+                    </button>
+                </form>
             </div>
 
         </div>
@@ -105,10 +121,28 @@
 
         <!-- IPO TABS -->
         <ul
-            class="nav nav-pills mb-4 gap-2"
+            class="nav nav-pills mb-4 gap-2 flex-wrap"
             id="ipoTabs"
             role="tablist"
         >
+
+            <!-- EXPLAIN IPO -->
+            <li class="nav-item" role="presentation">
+
+                <button
+                    class="nav-link"
+                    id="explain-tab"
+                    data-bs-toggle="pill"
+                    data-bs-target="#explain-ipo"
+                    type="button"
+                    role="tab"
+                >
+                    <i class="bi bi-book me-1"></i>
+                    What is an IPO?
+                </button>
+
+            </li>
+
 
             <!-- OPEN -->
             <li class="nav-item" role="presentation">
@@ -152,21 +186,43 @@
             </li>
 
 
-            <!-- LISTED -->
+            <!-- CLOSED -->
             <li class="nav-item" role="presentation">
 
                 <button
                     class="nav-link"
-                    id="listed-tab"
+                    id="closed-tab"
                     data-bs-toggle="pill"
-                    data-bs-target="#listed-ipos"
+                    data-bs-target="#closed-ipos"
                     type="button"
                     role="tab"
                 >
-                    Recently Listed
+                    Closed IPOs
 
                     <span class="badge text-bg-light ms-1">
-                        {{ recently_listed_ipos|length }}
+                        {{ closed_ipos|length }}
+                    </span>
+                </button>
+
+            </li>
+
+
+            <!-- OUR RECOMMENDATIONS -->
+            <li class="nav-item" role="presentation">
+
+                <button
+                    class="nav-link"
+                    id="recommendations-tab"
+                    data-bs-toggle="pill"
+                    data-bs-target="#recommendations"
+                    type="button"
+                    role="tab"
+                >
+                    <i class="bi bi-stars me-1"></i>
+                    Our Recommendations
+
+                    <span class="badge text-bg-light ms-1">
+                        {{ recommendations|length }}
                     </span>
                 </button>
 
@@ -177,6 +233,21 @@
 
         <!-- TAB CONTENT -->
         <div class="tab-content" id="ipoTabsContent">
+
+
+            <!-- =================================================
+                 EXPLAIN IPO - WHAT IS AN IPO
+            ================================================== -->
+
+            <div
+                class="tab-pane fade"
+                id="explain-ipo"
+                role="tabpanel"
+            >
+
+                {% include "ipo/ipo_explain_content.html" %}
+
+            </div>
 
 
             <!-- =================================================
@@ -309,16 +380,73 @@
 
 
             <!-- =================================================
-                 RECENTLY LISTED
+                 CLOSED IPOs
             ================================================== -->
 
             <div
                 class="tab-pane fade"
-                id="listed-ipos"
+                id="closed-ipos"
                 role="tabpanel"
             >
 
+                <div class="d-flex align-items-center justify-content-between mb-3">
+
+                    <div>
+                        <h2 class="h4 fw-bold mb-1">
+                            <i class="bi bi-hourglass-split me-2"></i>
+                            Closed IPOs
+                        </h2>
+
+                        <p class="text-muted mb-0">
+                            IPOs whose subscription window is now closed.
+                        </p>
+                    </div>
+
+                    <span class="badge text-bg-light border">
+                        {{ closed_ipos|length }} IPOs
+                    </span>
+
+                </div>
+
+                {% include "ipo/ipo_cards.html" with ipo_items=closed_ipos empty_title="No closed IPOs currently available" empty_message="Closed IPO records will appear here after they are added." %}
+
+                <!-- RECENTLY LISTED -->
+
+                <div class="d-flex align-items-center justify-content-between mb-3 mt-5">
+
+                    <div>
+                        <h2 class="h4 fw-bold mb-1">
+                            <i class="bi bi-rocket-takeoff me-2"></i>
+                            Recently Listed
+                        </h2>
+
+                        <p class="text-muted mb-0">
+                            IPOs that have already started trading.
+                        </p>
+                    </div>
+
+                    <span class="badge text-bg-light border">
+                        {{ recently_listed_ipos|length }} IPOs
+                    </span>
+
+                </div>
+
                 {% include "ipo/ipo_cards.html" with ipo_items=recently_listed_ipos empty_title="No recently listed IPOs currently available" empty_message="Recently listed IPO records will appear here after they are added." %}
+
+            </div>
+
+
+            <!-- =================================================
+                 OUR RECOMMENDATIONS
+            ================================================== -->
+
+            <div
+                class="tab-pane fade"
+                id="recommendations"
+                role="tabpanel"
+            >
+
+                {% include "ipo/ipo_recommendations.html" with rec_items=recommendations %}
 
             </div>
 
@@ -338,11 +466,11 @@
                     <strong>Financial Disclaimer:</strong>
 
                     This IPO Center is for educational purposes only.
-                    Scores are not investment recommendations. IPO prices
-                    may be volatile after listing. GMP is unofficial, may
-                    change quickly, and does not guarantee listing gains.
-                    Review official documents and conduct independent
-                    research.
+                    Scores and recommendations are not investment advice.
+                    IPO prices may be volatile after listing. GMP is
+                    unofficial, may change quickly, and does not guarantee
+                    listing gains. Review official documents and conduct
+                    independent research.
 
                 </div>
 
